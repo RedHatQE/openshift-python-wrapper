@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Installing and Creating Your First Resource - openshift-python-wrapper</title>
     <meta name="description" content="Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls">
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/style.css?v=66bf87bdd9">
     <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
     <link rel="alternate" type="text/plain" title="LLM Documentation Index" href="llms.txt">
     <link rel="alternate" type="text/plain" title="LLM Full Documentation" href="llms-full.txt">
@@ -34,13 +34,6 @@
                             Installing and Creating Your First Resource
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">User Guides</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="connecting-to-clusters.html"
@@ -98,6 +91,13 @@
                         </a>
                     </li>
 
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Testing and Generation</h3>
+                <ul class="nav-group-pages">
+
                     <li>
                         <a href="testing-without-cluster.html"
                            class="nav-link">
@@ -112,11 +112,18 @@
                         </a>
                     </li>
 
+                    <li>
+                        <a href="class-generator-cli.html"
+                           class="nav-link">
+                            class-generator CLI Reference
+                        </a>
+                    </li>
+
                 </ul>
             </div>
 
             <div class="nav-group">
-                <h3 class="nav-group-title">Recipes</h3>
+                <h3 class="nav-group-title">Guides</h3>
                 <ul class="nav-group-pages">
 
                     <li>
@@ -148,25 +155,11 @@
                     </li>
 
                     <li>
-                        <a href="class-generator-cli.html"
-                           class="nav-link">
-                            class-generator CLI Reference
-                        </a>
-                    </li>
-
-                    <li>
                         <a href="environment-variables.html"
                            class="nav-link">
                             Environment Variables and Configuration
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Internals</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="resource-class-hierarchy.html"
@@ -182,13 +175,6 @@
                         </a>
                     </li>
 
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Using Resources</h3>
-                <ul class="nav-group-pages">
-
                     <li>
                         <a href="working-with-events.html"
                            class="nav-link">
@@ -202,13 +188,6 @@
                             Executing Commands in Pods and Retrieving Logs
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">API Reference</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="error-handling.html"
@@ -238,8 +217,8 @@
                 <button class="top-bar-search-btn" id="search-trigger" aria-label="Search">
                     <kbd>&#8984;K</kbd> Search
                 </button>
-                <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener" class="docsfy-badge" title="Generated with docsfy">
-                    ⚡ docs<span class="brand-accent">fy</span>
+                <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener" class="docsite-badge" title="documentation">
+                    ⚡ pi<span class="brand-accent">-docsite</span>
                 </a>
 
                 <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener noreferrer" class="top-bar-github" id="github-link" data-repo-url="https://github.com/RedHatQE/openshift-python-wrapper">
@@ -266,12 +245,7 @@
                          converted to HTML server-side by the markdown library, not
                          user-supplied input. XSS risk is minimal and accepted since
                          the AI generates the content, not end users. -->
-                    <p>Let me explore the repository structure and key files to understand the codebase before writing the documentation.</p>
-<p>Now let me look at the <code>NamespacedResource</code> class and the <code>get</code> classmethod for listing resources:</p>
-<p>Now let me check the <code>get_client</code> with the <code>utils/client_config.py</code> for understanding connection options:</p>
-<p>Now I have a thorough understanding of the codebase. Let me write the documentation:</p>
-<p>Now I have a comprehensive understanding of the codebase. Let me write the guide:</p>
-<h1 id="installing-and-creating-your-first-resource">Installing and Creating Your First Resource</h1>
+                    <h1 id="installing-and-creating-your-first-resource">Installing and Creating Your First Resource</h1>
 <p>Get up and running with openshift-python-wrapper so you can programmatically create, query, and delete Kubernetes and OpenShift resources from Python. This guide takes you from installation to your first working resource in under 5 minutes.</p>
 <h2 id="prerequisites">Prerequisites</h2>
 <ul>
@@ -288,9 +262,9 @@
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
 
-<span class="k">with</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-first-namespace&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ns</span><span class="p">:</span>
+<span class="k">with</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-first-namespace"</span><span class="p">)</span> <span class="k">as</span> <span class="n">ns</span><span class="p">:</span>
     <span class="n">ns</span><span class="o">.</span><span class="n">wait_for_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">Namespace</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Namespace </span><span class="si">{</span><span class="n">ns</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is active: </span><span class="si">{</span><span class="n">ns</span><span class="o">.</span><span class="n">exists</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Namespace </span><span class="si">{</span><span class="n">ns</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is active: </span><span class="si">{</span><span class="n">ns</span><span class="o">.</span><span class="n">exists</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="c1"># Namespace is automatically deleted when the block exits</span>
 </code></pre></div>
 
@@ -313,11 +287,11 @@ pip install openshift-python-wrapper</code></p>
 </code></pre></div>
 
 <p>You can also point to a specific kubeconfig file:</p>
-<div class="highlight"><pre><span></span><code><span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="s2">&quot;/path/to/kubeconfig&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="s2">"/path/to/kubeconfig"</span><span class="p">)</span>
 </code></pre></div>
 
 <p>Or connect with a token and host directly:</p>
-<div class="highlight"><pre><span></span><code><span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s2">&quot;https://api.mycluster.example.com:6443&quot;</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="s2">&quot;sha256~...&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s2">"https://api.mycluster.example.com:6443"</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="s2">"sha256~..."</span><span class="p">)</span>
 </code></pre></div>
 
 <blockquote>
@@ -332,7 +306,7 @@ pip install openshift-python-wrapper</code></p>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
 
-<span class="k">with</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;namespace-example-2&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ns</span><span class="p">:</span>
+<span class="k">with</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"namespace-example-2"</span><span class="p">)</span> <span class="k">as</span> <span class="n">ns</span><span class="p">:</span>
     <span class="n">ns</span><span class="o">.</span><span class="n">wait_for_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">Namespace</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">ns</span><span class="o">.</span><span class="n">exists</span>
 <span class="c1"># Resource is automatically cleaned up here</span>
@@ -345,7 +319,7 @@ pip install openshift-python-wrapper</code></p>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
 
-<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;namespace-example-1&quot;</span><span class="p">)</span>
+<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"namespace-example-1"</span><span class="p">)</span>
 <span class="n">ns</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 <span class="k">assert</span> <span class="n">ns</span><span class="o">.</span><span class="n">exists</span>
 <span class="n">ns</span><span class="o">.</span><span class="n">clean_up</span><span class="p">()</span>
@@ -363,12 +337,12 @@ pip install openshift-python-wrapper</code></p>
 
 <span class="k">with</span> <span class="n">ConfigMap</span><span class="p">(</span>
     <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;app-config&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
-    <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;app.properties&quot;</span><span class="p">:</span> <span class="s2">&quot;debug=true</span><span class="se">\n</span><span class="s2">port=8080&quot;</span><span class="p">},</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"app-config"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">,</span>
+    <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">"app.properties"</span><span class="p">:</span> <span class="s2">"debug=true</span><span class="se">\n</span><span class="s2">port=8080"</span><span class="p">},</span>
 <span class="p">)</span> <span class="k">as</span> <span class="n">cm</span><span class="p">:</span>
     <span class="k">assert</span> <span class="n">cm</span><span class="o">.</span><span class="n">exists</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ConfigMap </span><span class="si">{</span><span class="n">cm</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> created in namespace </span><span class="si">{</span><span class="n">cm</span><span class="o">.</span><span class="n">namespace</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"ConfigMap </span><span class="si">{</span><span class="n">cm</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> created in namespace </span><span class="si">{</span><span class="n">cm</span><span class="o">.</span><span class="n">namespace</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 
 <h2 id="step-5-query-resources">Step 5: Query Resources</h2>
@@ -378,14 +352,14 @@ pip install openshift-python-wrapper</code></p>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
 
-<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 </code></pre></div>
 
 <p>Filter by labels using <code>label_selector</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">label_selector</span><span class="o">=</span><span class="s2">&quot;app=nginx&quot;</span><span class="p">):</span>
+<div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">label_selector</span><span class="o">=</span><span class="s2">"app=nginx"</span><span class="p">):</span>
     <span class="n">node</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">node</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pod </span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is running on node </span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Pod </span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is running on node </span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 
 <p>Check if a specific resource exists:</p>
@@ -394,9 +368,9 @@ pip install openshift-python-wrapper</code></p>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
 
-<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">ns</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Namespace exists!&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Namespace exists!"</span><span class="p">)</span>
 </code></pre></div>
 
 <blockquote>
@@ -404,7 +378,7 @@ pip install openshift-python-wrapper</code></p>
 </blockquote>
 <h2 id="step-6-delete-a-resource">Step 6: Delete a Resource</h2>
 <p>If you didn't use a context manager, call <code>clean_up()</code> to delete the resource:</p>
-<div class="highlight"><pre><span></span><code><span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-temp-namespace&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-temp-namespace"</span><span class="p">)</span>
 <span class="n">ns</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 <span class="c1"># ... do work ...</span>
 <span class="n">ns</span><span class="o">.</span><span class="n">clean_up</span><span class="p">()</span>
@@ -425,21 +399,21 @@ pip install openshift-python-wrapper</code></p>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
 
-<span class="k">with</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;quickstart-demo&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ns</span><span class="p">:</span>
+<span class="k">with</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"quickstart-demo"</span><span class="p">)</span> <span class="k">as</span> <span class="n">ns</span><span class="p">:</span>
     <span class="n">ns</span><span class="o">.</span><span class="n">wait_for_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">Namespace</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">ConfigMap</span><span class="p">(</span>
         <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;demo-config&quot;</span><span class="p">,</span>
-        <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;quickstart-demo&quot;</span><span class="p">,</span>
-        <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;greeting&quot;</span><span class="p">:</span> <span class="s2">&quot;hello from openshift-python-wrapper&quot;</span><span class="p">},</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"demo-config"</span><span class="p">,</span>
+        <span class="n">namespace</span><span class="o">=</span><span class="s2">"quickstart-demo"</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">"greeting"</span><span class="p">:</span> <span class="s2">"hello from openshift-python-wrapper"</span><span class="p">},</span>
     <span class="p">)</span> <span class="k">as</span> <span class="n">cm</span><span class="p">:</span>
         <span class="k">assert</span> <span class="n">cm</span><span class="o">.</span><span class="n">exists</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created ConfigMap &#39;</span><span class="si">{</span><span class="n">cm</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; in namespace &#39;</span><span class="si">{</span><span class="n">ns</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Created ConfigMap '</span><span class="si">{</span><span class="n">cm</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">' in namespace '</span><span class="si">{</span><span class="n">ns</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
 
         <span class="c1"># Query it back</span>
-        <span class="k">for</span> <span class="n">config_map</span> <span class="ow">in</span> <span class="n">ConfigMap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;quickstart-demo&quot;</span><span class="p">):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Found: </span><span class="si">{</span><span class="n">config_map</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">config_map</span> <span class="ow">in</span> <span class="n">ConfigMap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"quickstart-demo"</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Found: </span><span class="si">{</span><span class="n">config_map</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="c1"># ConfigMap cleaned up here</span>
 <span class="c1"># Namespace cleaned up here</span>
 </code></pre></div>
@@ -452,7 +426,7 @@ pip install openshift-python-wrapper</code></p>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
 
-<span class="n">cm</span> <span class="o">=</span> <span class="n">ConfigMap</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">yaml_file</span><span class="o">=</span><span class="s2">&quot;my-configmap.yaml&quot;</span><span class="p">)</span>
+<span class="n">cm</span> <span class="o">=</span> <span class="n">ConfigMap</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">yaml_file</span><span class="o">=</span><span class="s2">"my-configmap.yaml"</span><span class="p">)</span>
 <span class="n">cm</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 </code></pre></div>
 
@@ -465,12 +439,12 @@ pip install openshift-python-wrapper</code></p>
 
 <span class="k">with</span> <span class="n">ConfigMap</span><span class="p">(</span>
     <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test-config&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
-    <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">},</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"test-config"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">,</span>
+    <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">"key"</span><span class="p">:</span> <span class="s2">"value"</span><span class="p">},</span>
 <span class="p">)</span> <span class="k">as</span> <span class="n">cm</span><span class="p">:</span>
     <span class="n">cm</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created (fake): </span><span class="si">{</span><span class="n">cm</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Created (fake): </span><span class="si">{</span><span class="n">cm</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 
 <blockquote>
@@ -485,9 +459,9 @@ pip install openshift-python-wrapper</code></p>
 
 <span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span>
     <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;validated-pod&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
-    <span class="n">containers</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;nginx&quot;</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;nginx:latest&quot;</span><span class="p">}],</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"validated-pod"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">,</span>
+    <span class="n">containers</span><span class="o">=</span><span class="p">[{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"nginx"</span><span class="p">,</span> <span class="s2">"image"</span><span class="p">:</span> <span class="s2">"nginx:latest"</span><span class="p">}],</span>
     <span class="n">schema_validation_enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Validates on create</span>
 <span class="p">)</span>
 <span class="n">pod</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
@@ -495,9 +469,9 @@ pip install openshift-python-wrapper</code></p>
 
 <p>You can also validate manually without creating:</p>
 <div class="highlight"><pre><span></span><code><span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;check-me&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
-    <span class="n">containers</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;nginx&quot;</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;nginx:latest&quot;</span><span class="p">}],</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"check-me"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">,</span>
+    <span class="n">containers</span><span class="o">=</span><span class="p">[{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"nginx"</span><span class="p">,</span> <span class="s2">"image"</span><span class="p">:</span> <span class="s2">"nginx:latest"</span><span class="p">}],</span>
 <span class="p">)</span>
 <span class="n">pod</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>  <span class="c1"># Raises ValidationError if invalid</span>
 </code></pre></div>
@@ -512,7 +486,7 @@ pip install openshift-python-wrapper</code></p>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
 
-<span class="k">with</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;wait-demo&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ns</span><span class="p">:</span>
+<span class="k">with</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"wait-demo"</span><span class="p">)</span> <span class="k">as</span> <span class="n">ns</span><span class="p">:</span>
     <span class="n">ns</span><span class="o">.</span><span class="n">wait_for_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">Namespace</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
 </code></pre></div>
 
@@ -526,7 +500,7 @@ pip install openshift-python-wrapper</code></p>
 </code></pre></div>
 
 <p>Or pass it directly:</p>
-<div class="highlight"><pre><span></span><code><span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="s2">&quot;/path/to/kubeconfig&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="s2">"/path/to/kubeconfig"</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="resource-not-found-after-creation">Resource not found after creation</h3>
@@ -541,10 +515,10 @@ pip install openshift-python-wrapper</code></p>
 <li>Namespaced resources (like <code>Pod</code>, <code>ConfigMap</code>, <code>Deployment</code>) require both <code>name</code> and <code>namespace</code>.</li>
 </ul>
 <div class="highlight"><pre><span></span><code><span class="c1"># Cluster-scoped — only name needed</span>
-<span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-ns&quot;</span><span class="p">)</span>
+<span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-ns"</span><span class="p">)</span>
 
 <span class="c1"># Namespaced — both name and namespace required</span>
-<span class="n">ConfigMap</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-cm&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-ns&quot;</span><span class="p">)</span>
+<span class="n">ConfigMap</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-cm"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-ns"</span><span class="p">)</span>
 </code></pre></div>
 
 <h2 id="related-pages">Related Pages</h2>
@@ -612,10 +586,7 @@ pip install openshift-python-wrapper</code></p>
 
         <footer class="page-footer">
 
-            <span class="footer-version">Generated from version 11.0.134</span>
-            <span class="footer-sep">&middot;</span>
-
-            Generated with <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener">docs<span class="brand-accent">fy</span></a>
+            Built from <code>docs/*.md</code> by <code>pi-docsite</code>
             <span class="footer-sep">&middot;</span>
             <span class="footer-llm">LLM-friendly: <a href="llms.txt">llms.txt</a> &middot; <a href="llms-full.txt">llms-full.txt</a></span>
         </footer>
@@ -623,13 +594,14 @@ pip install openshift-python-wrapper</code></p>
 
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <script src="assets/theme.js"></script>
-    <script src="assets/search.js"></script>
-    <script src="assets/copy.js"></script>
-    <script src="assets/callouts.js"></script>
-    <script src="assets/scrollspy.js"></script>
-    <script src="assets/codelabels.js"></script>
-    <script src="assets/github.js"></script>
+    <script src="assets/theme.js?v=66bf87bdd9"></script>
+
+    <script src="assets/search.js?v=66bf87bdd9"></script>
+    <script src="assets/copy.js?v=66bf87bdd9"></script>
+    <script src="assets/callouts.js?v=66bf87bdd9"></script>
+    <script src="assets/scrollspy.js?v=66bf87bdd9"></script>
+    <script src="assets/codelabels.js?v=66bf87bdd9"></script>
+    <script src="assets/github.js?v=66bf87bdd9"></script>
     <script>
 (function() {
     var toggle = document.getElementById('sidebar-toggle');
@@ -675,5 +647,6 @@ pip install openshift-python-wrapper</code></p>
     }
 })();
 </script>
+<!-- generated by pi-docsite -->
 </body>
 </html>

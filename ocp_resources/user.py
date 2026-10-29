@@ -25,13 +25,13 @@ class User(Resource):
     ) -> None:
         r"""
         Args:
-            full_name (str): FullName is the full name of user
+            full_name (str): fullName is the full name of user
 
-            groups (list[Any]): Groups specifies group names this user is a member of. This field is
+            groups (list[Any]): groups specifies group names this user is a member of. This field is
               deprecated and will be removed in a future release. Instead,
               create a Group object containing the name of this User.
 
-            identities (list[Any]): Identities are the identities associated with this user
+            identities (list[Any]): identities are the identities associated with this user
 
         """
         super().__init__(**kwargs)
@@ -41,6 +41,7 @@ class User(Resource):
         self.identities = identities
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:

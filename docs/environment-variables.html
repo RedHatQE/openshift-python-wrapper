@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Environment Variables and Configuration - openshift-python-wrapper</title>
     <meta name="description" content="Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls">
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/style.css?v=66bf87bdd9">
     <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
     <link rel="alternate" type="text/plain" title="LLM Documentation Index" href="llms.txt">
     <link rel="alternate" type="text/plain" title="LLM Full Documentation" href="llms-full.txt">
@@ -34,13 +34,6 @@
                             Installing and Creating Your First Resource
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">User Guides</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="connecting-to-clusters.html"
@@ -98,6 +91,13 @@
                         </a>
                     </li>
 
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Testing and Generation</h3>
+                <ul class="nav-group-pages">
+
                     <li>
                         <a href="testing-without-cluster.html"
                            class="nav-link">
@@ -112,11 +112,18 @@
                         </a>
                     </li>
 
+                    <li>
+                        <a href="class-generator-cli.html"
+                           class="nav-link">
+                            class-generator CLI Reference
+                        </a>
+                    </li>
+
                 </ul>
             </div>
 
             <div class="nav-group">
-                <h3 class="nav-group-title">Recipes</h3>
+                <h3 class="nav-group-title">Guides</h3>
                 <ul class="nav-group-pages">
 
                     <li>
@@ -148,25 +155,11 @@
                     </li>
 
                     <li>
-                        <a href="class-generator-cli.html"
-                           class="nav-link">
-                            class-generator CLI Reference
-                        </a>
-                    </li>
-
-                    <li>
                         <a href="environment-variables.html"
                            class="nav-link active" aria-current="page">
                             Environment Variables and Configuration
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Internals</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="resource-class-hierarchy.html"
@@ -182,13 +175,6 @@
                         </a>
                     </li>
 
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Using Resources</h3>
-                <ul class="nav-group-pages">
-
                     <li>
                         <a href="working-with-events.html"
                            class="nav-link">
@@ -202,13 +188,6 @@
                             Executing Commands in Pods and Retrieving Logs
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">API Reference</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="error-handling.html"
@@ -238,8 +217,8 @@
                 <button class="top-bar-search-btn" id="search-trigger" aria-label="Search">
                     <kbd>&#8984;K</kbd> Search
                 </button>
-                <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener" class="docsfy-badge" title="Generated with docsfy">
-                    ⚡ docs<span class="brand-accent">fy</span>
+                <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener" class="docsite-badge" title="documentation">
+                    ⚡ pi<span class="brand-accent">-docsite</span>
                 </a>
 
                 <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener noreferrer" class="top-bar-github" id="github-link" data-repo-url="https://github.com/RedHatQE/openshift-python-wrapper">
@@ -266,25 +245,10 @@
                          converted to HTML server-side by the markdown library, not
                          user-supplied input. XSS risk is minimal and accepted since
                          the AI generates the content, not end users. -->
-                    <p>Let me start by reading the knowledge graph and page manifest, then explore the codebase for environment variables.</p>
-<p>Now let me look at the <code>keys_to_hash</code> and hash-related functionality more closely:</p>
-<p>Now let me look at the <code>get_logger</code> import and how log levels work:</p>
-<p>Now let me check for any CI/CD or config-related environment variables:</p>
-<p>Let me also look for any validation-related environment variables and enable_validation_by_default:</p>
-<p>Now let me look at the <code>get_logger</code> usage and the <code>simple_logger</code> format:</p>
-<p>Now let me check the deploy() and clean_up() methods more carefully, and also the hash_resource_dict method:</p>
-<p>Let me also check how <code>replace_key_with_hashed_value</code> is defined:</p>
-<p>Now let me check the MCP server for environment variables:</p>
-<p>Now let me check if there are any other environment variable usages in the class_generator:</p>
-<p>Let me verify there are no other env vars in tests:</p>
-<p>Let me also check the full <code>get_client</code> function and the <code>save_kubeconfig</code> function:</p>
-<p>Now let me look for any additional environment variables in fake_kubernetes_client:</p>
-<p>Let me look at how the deploy and clean_up methods use the skip logic:</p>
-<p>Now I have all the information needed. Let me write the documentation:</p>
-<h1 id="environment-variables-and-configuration">Environment Variables and Configuration</h1>
+                    <h1 id="environment-variables-and-configuration">Environment Variables and Configuration</h1>
 <p>This page documents all environment variables recognized by <code>openshift-python-wrapper</code> at runtime. These variables control logging behavior, resource lifecycle operations, proxy configuration, cluster connectivity, and sensitive data hashing.</p>
 <h2 id="quick-reference">Quick Reference</h2>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Environment Variable</th>
@@ -334,11 +298,11 @@
 <td><em>(unset)</em></td>
 </tr>
 </tbody>
-</table>
-<hr />
+</table></div>
+<hr>
 <h2 id="cluster-connection">Cluster Connection</h2>
 <h3 id="kubeconfig"><code>KUBECONFIG</code></h3>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -363,7 +327,7 @@
 <td><code>ocp_resources/resource.py</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Path to the kubeconfig file used when creating a Kubernetes <code>DynamicClient</code>. Read when no explicit <code>config_file</code>, <code>config_dict</code>, <code>host</code>/<code>token</code>, or <code>username</code>/<code>password</code> arguments are passed to <code>get_client()</code>.</p>
 <blockquote>
 <p><strong>Note:</strong> The standard <code>kubernetes</code> Python client reads <code>KUBECONFIG</code> at import time. If you set this variable in code (after import), <code>openshift-python-wrapper</code> handles it by explicitly passing the value to the client constructor. See <a href="connecting-to-clusters.html">Connecting to Clusters</a> for all connection options.</p>
@@ -377,9 +341,9 @@
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
 </code></pre></div>
 
-<hr />
+<hr>
 <h3 id="https_proxy-http_proxy"><code>HTTPS_PROXY</code> / <code>HTTP_PROXY</code></h3>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -404,7 +368,7 @@
 <td><code>ocp_resources/resource.py</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Sets the proxy on the Kubernetes client configuration when no proxy is already configured on the <code>client_configuration</code> object. <code>HTTPS_PROXY</code> takes precedence over <code>HTTP_PROXY</code> when both are set.</p>
 <div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">HTTPS_PROXY</span><span class="o">=</span>http://proxy.example.com:8080
 </code></pre></div>
@@ -424,10 +388,10 @@
 <li><code>HTTPS_PROXY</code> environment variable</li>
 <li><code>HTTP_PROXY</code> environment variable</li>
 </ol>
-<hr />
+<hr>
 <h2 id="logging">Logging</h2>
 <h3 id="openshift_python_wrapper_log_level"><code>OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL</code></h3>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -456,25 +420,26 @@
 <td><code>ocp_resources/resource.py</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Controls the log level for each resource instance's logger. The logger is created per-resource using the <code>simple_logger</code> library.</p>
 <div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL</span><span class="o">=</span>DEBUG
 </code></pre></div>
 
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;DEBUG&quot;</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"DEBUG"</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_client</span>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
-<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-pod&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">)</span>
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"my-pod"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">)</span>
 <span class="c1"># Logger on this Pod instance now uses DEBUG level</span>
 </code></pre></div>
 
-<hr />
+<hr>
 <h3 id="openshift_python_wrapper_log_file"><code>OPENSHIFT_PYTHON_WRAPPER_LOG_FILE</code></h3>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -499,26 +464,27 @@
 <td><code>ocp_resources/resource.py</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Redirects resource log output to a file. When unset or empty, logs are written to stdout.</p>
 <div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">OPENSHIFT_PYTHON_WRAPPER_LOG_FILE</span><span class="o">=</span>/var/log/ocp-wrapper.log
 </code></pre></div>
 
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENSHIFT_PYTHON_WRAPPER_LOG_FILE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;/tmp/ocp-wrapper.log&quot;</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"OPENSHIFT_PYTHON_WRAPPER_LOG_FILE"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"/tmp/ocp-wrapper.log"</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.namespace</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_client</span>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
-<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;test-ns&quot;</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">)</span>
+<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"test-ns"</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">)</span>
 <span class="c1"># All log output for this resource is written to /tmp/ocp-wrapper.log</span>
 </code></pre></div>
 
-<hr />
+<hr>
 <h2 id="sensitive-data-hashing">Sensitive Data Hashing</h2>
 <h3 id="openshift_python_wrapper_hash_log_data"><code>OPENSHIFT_PYTHON_WRAPPER_HASH_LOG_DATA</code></h3>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -547,10 +513,10 @@
 <td><code>ocp_resources/resource.py</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Controls whether sensitive fields in resource dictionaries are replaced with <code>"*******"</code> when logged. When set to <code>"false"</code>, sensitive data is logged in cleartext.</p>
 <p>Hashing is applied to fields declared in each resource class's <code>keys_to_hash</code> property. The following built-in resources define sensitive keys:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Resource Class</th>
@@ -575,7 +541,7 @@
 <td><code>spec&gt;template&gt;spec&gt;volumes[]&gt;cloudInitNoCloud&gt;userData</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <blockquote>
 <p><strong>Warning:</strong> Setting this to <code>"false"</code> causes sensitive data (e.g., secrets, tokens) to appear in log output. Use only for debugging in secure environments.</p>
 </blockquote>
@@ -584,21 +550,22 @@
 </code></pre></div>
 
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENSHIFT_PYTHON_WRAPPER_HASH_LOG_DATA&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;false&quot;</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"OPENSHIFT_PYTHON_WRAPPER_HASH_LOG_DATA"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"false"</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.secret</span><span class="w"> </span><span class="kn">import</span> <span class="n">Secret</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_client</span>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
-<span class="n">secret</span> <span class="o">=</span> <span class="n">Secret</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-secret&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">)</span>
-<span class="c1"># Logs will now show raw secret data instead of &quot;*******&quot;</span>
+<span class="n">secret</span> <span class="o">=</span> <span class="n">Secret</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"my-secret"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">)</span>
+<span class="c1"># Logs will now show raw secret data instead of "*******"</span>
 </code></pre></div>
 
 <blockquote>
 <p><strong>Note:</strong> Hashing also depends on the <code>hash_log_data</code> constructor parameter on each resource instance. Both must be enabled for hashing to occur. The <code>hash_log_data</code> parameter defaults to <code>True</code>. See <a href="resource-api.html">Resource and NamespacedResource API</a> for constructor details.</p>
 </blockquote>
 <p><strong>Interaction with <code>hash_log_data</code> parameter:</strong></p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th><code>OPENSHIFT_PYTHON_WRAPPER_HASH_LOG_DATA</code></th>
@@ -628,11 +595,11 @@
 <td>Sensitive fields <strong>not</strong> hashed</td>
 </tr>
 </tbody>
-</table>
-<hr />
+</table></div>
+<hr>
 <h2 id="resource-reuse-skip-creation">Resource Reuse (Skip Creation)</h2>
 <h3 id="reuse_if_resource_exists"><code>REUSE_IF_RESOURCE_EXISTS</code></h3>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -657,7 +624,7 @@
 <td><code>ocp_resources/resource.py</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>When set, <code>deploy()</code> checks whether the target resource already exists on the cluster. If a match is found, the existing resource is returned without creating a new one. This is intended for debugging and iterative development workflows.</p>
 <blockquote>
 <p><strong>Warning:</strong> Spaces are significant in the value syntax. The value is parsed as YAML.</p>
@@ -667,7 +634,7 @@
 </code></pre></div>
 
 <p><strong>Matching rules:</strong></p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Pattern</th>
@@ -692,16 +659,16 @@
 <td>Multiple resource patterns combined</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Examples:</strong></p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Skip all Pod creation if the pod already exists</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">REUSE_IF_RESOURCE_EXISTS</span><span class="o">=</span><span class="s2">&quot;{Pod: {}}&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">REUSE_IF_RESOURCE_EXISTS</span><span class="o">=</span><span class="s2">"{Pod: {}}"</span>
 
 <span class="c1"># Skip specific pod in specific namespace</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">REUSE_IF_RESOURCE_EXISTS</span><span class="o">=</span><span class="s2">&quot;{Pod: {my-pod: my-namespace}}&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">REUSE_IF_RESOURCE_EXISTS</span><span class="o">=</span><span class="s2">"{Pod: {my-pod: my-namespace}}"</span>
 
 <span class="c1"># Skip namespace and pod creation</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">REUSE_IF_RESOURCE_EXISTS</span><span class="o">=</span><span class="s2">&quot;{Namespace: {test-ns:}, Pod: {my-pod: test-ns}}&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">REUSE_IF_RESOURCE_EXISTS</span><span class="o">=</span><span class="s2">"{Namespace: {test-ns:}, Pod: {my-pod: test-ns}}"</span>
 </code></pre></div>
 
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
@@ -712,10 +679,10 @@
 <span class="c1"># If REUSE_IF_RESOURCE_EXISTS is set and a matching Pod exists,</span>
 <span class="c1"># deploy() returns the existing resource without calling create()</span>
 <span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-pod&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"my-pod"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
     <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-    <span class="n">containers</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;nginx&quot;</span><span class="p">}],</span>
+    <span class="n">containers</span><span class="o">=</span><span class="p">[{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"test"</span><span class="p">,</span> <span class="s2">"image"</span><span class="p">:</span> <span class="s2">"nginx"</span><span class="p">}],</span>
 <span class="p">)</span>
 <span class="n">pod</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>  <span class="c1"># Skips creation if resource matches the env var pattern</span>
 </code></pre></div>
@@ -723,10 +690,10 @@
 <blockquote>
 <p><strong>Note:</strong> The resource must actually exist on the cluster for the skip to take effect. If the resource does not exist, <code>deploy()</code> proceeds with normal creation.</p>
 </blockquote>
-<hr />
+<hr>
 <h2 id="skip-teardown">Skip Teardown</h2>
 <h3 id="skip_resource_teardown"><code>SKIP_RESOURCE_TEARDOWN</code></h3>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -751,7 +718,7 @@
 <td><code>ocp_resources/resource.py</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>When set, <code>clean_up()</code> skips deletion for matching resources and returns <code>True</code> without calling <code>delete()</code>. This is intended for debugging — preserving resources on the cluster after tests finish.</p>
 <blockquote>
 <p><strong>Warning:</strong> Spaces are significant in the value syntax. The value is parsed as YAML.</p>
@@ -759,7 +726,7 @@
 <p><strong>Value format:</strong></p>
 <p>Uses the same YAML dict syntax as <a href="#reuse_if_resource_exists"><code>REUSE_IF_RESOURCE_EXISTS</code></a>.</p>
 <p><strong>Matching rules:</strong></p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Pattern</th>
@@ -784,13 +751,13 @@
 <td>Multiple resource patterns combined</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Examples:</strong></p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Keep all Namespaces after test run</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">SKIP_RESOURCE_TEARDOWN</span><span class="o">=</span><span class="s2">&quot;{Namespace: {}}&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">SKIP_RESOURCE_TEARDOWN</span><span class="o">=</span><span class="s2">"{Namespace: {}}"</span>
 
 <span class="c1"># Keep specific resources</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">SKIP_RESOURCE_TEARDOWN</span><span class="o">=</span><span class="s2">&quot;{Namespace: {test-ns:}, Pod: {debug-pod: test-ns}}&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">SKIP_RESOURCE_TEARDOWN</span><span class="o">=</span><span class="s2">"{Namespace: {test-ns:}, Pod: {debug-pod: test-ns}}"</span>
 </code></pre></div>
 
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
@@ -798,10 +765,10 @@
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
 <span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;debug-pod&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;test-ns&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"debug-pod"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"test-ns"</span><span class="p">,</span>
     <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-    <span class="n">containers</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;nginx&quot;</span><span class="p">}],</span>
+    <span class="n">containers</span><span class="o">=</span><span class="p">[{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"test"</span><span class="p">,</span> <span class="s2">"image"</span><span class="p">:</span> <span class="s2">"nginx"</span><span class="p">}],</span>
 <span class="p">)</span>
 <span class="n">pod</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 
@@ -813,16 +780,16 @@
 <blockquote>
 <p><strong>Tip:</strong> Use <code>REUSE_IF_RESOURCE_EXISTS</code> and <code>SKIP_RESOURCE_TEARDOWN</code> together for a fast debug loop: skip creation if a resource already exists, and skip teardown so it persists between runs.</p>
 </blockquote>
-<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">REUSE_IF_RESOURCE_EXISTS</span><span class="o">=</span><span class="s2">&quot;{Pod: {debug-pod: test-ns}}&quot;</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">SKIP_RESOURCE_TEARDOWN</span><span class="o">=</span><span class="s2">&quot;{Pod: {debug-pod: test-ns}}&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">REUSE_IF_RESOURCE_EXISTS</span><span class="o">=</span><span class="s2">"{Pod: {debug-pod: test-ns}}"</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">SKIP_RESOURCE_TEARDOWN</span><span class="o">=</span><span class="s2">"{Pod: {debug-pod: test-ns}}"</span>
 </code></pre></div>
 
-<hr />
+<hr>
 <h2 id="combined-usage-patterns">Combined Usage Patterns</h2>
 <h3 id="debug-iteration-loop">Debug iteration loop</h3>
 <p>Set both skip variables to avoid re-creating and tearing down resources between test runs:</p>
-<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">REUSE_IF_RESOURCE_EXISTS</span><span class="o">=</span><span class="s2">&quot;{Namespace: {test-ns:}, Pod: {my-pod: test-ns}}&quot;</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">SKIP_RESOURCE_TEARDOWN</span><span class="o">=</span><span class="s2">&quot;{Namespace: {test-ns:}, Pod: {my-pod: test-ns}}&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">REUSE_IF_RESOURCE_EXISTS</span><span class="o">=</span><span class="s2">"{Namespace: {test-ns:}, Pod: {my-pod: test-ns}}"</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">SKIP_RESOURCE_TEARDOWN</span><span class="o">=</span><span class="s2">"{Namespace: {test-ns:}, Pod: {my-pod: test-ns}}"</span>
 </code></pre></div>
 
 <h3 id="full-debug-logging-with-unhashed-data">Full debug logging with unhashed data</h3>
@@ -839,10 +806,10 @@
 <span class="nb">export</span><span class="w"> </span><span class="nv">HTTPS_PROXY</span><span class="o">=</span>http://corporate-proxy.example.com:3128
 </code></pre></div>
 
-<hr />
+<hr>
 <h2 id="programmatic-configuration-alternatives">Programmatic Configuration Alternatives</h2>
 <p>Several behaviors controlled by environment variables can also be set programmatically via constructor parameters or function arguments. See <a href="resource-api.html">Resource and NamespacedResource API</a> for full constructor parameter documentation.</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Environment Variable</th>
@@ -863,7 +830,7 @@
 <td><code>Resource(hash_log_data=False, ...)</code> constructor parameter</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <blockquote>
 <p><strong>Note:</strong> <code>OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL</code>, <code>OPENSHIFT_PYTHON_WRAPPER_LOG_FILE</code>, <code>REUSE_IF_RESOURCE_EXISTS</code>, and <code>SKIP_RESOURCE_TEARDOWN</code> can <strong>only</strong> be configured via environment variables.</p>
 </blockquote>
@@ -879,9 +846,9 @@
             </article>
             <nav class="page-nav">
 
-                <a href="class-generator-cli.html" class="page-nav-link page-nav-prev">
+                <a href="resource-api.html" class="page-nav-link page-nav-prev">
                     <span class="page-nav-label">Previous</span>
-                    <span class="page-nav-title">class-generator CLI Reference</span>
+                    <span class="page-nav-title">Resource and NamespacedResource API</span>
                 </a>
 
 
@@ -939,10 +906,7 @@
 
         <footer class="page-footer">
 
-            <span class="footer-version">Generated from version 11.0.134</span>
-            <span class="footer-sep">&middot;</span>
-
-            Generated with <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener">docs<span class="brand-accent">fy</span></a>
+            Built from <code>docs/*.md</code> by <code>pi-docsite</code>
             <span class="footer-sep">&middot;</span>
             <span class="footer-llm">LLM-friendly: <a href="llms.txt">llms.txt</a> &middot; <a href="llms-full.txt">llms-full.txt</a></span>
         </footer>
@@ -950,13 +914,14 @@
 
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <script src="assets/theme.js"></script>
-    <script src="assets/search.js"></script>
-    <script src="assets/copy.js"></script>
-    <script src="assets/callouts.js"></script>
-    <script src="assets/scrollspy.js"></script>
-    <script src="assets/codelabels.js"></script>
-    <script src="assets/github.js"></script>
+    <script src="assets/theme.js?v=66bf87bdd9"></script>
+
+    <script src="assets/search.js?v=66bf87bdd9"></script>
+    <script src="assets/copy.js?v=66bf87bdd9"></script>
+    <script src="assets/callouts.js?v=66bf87bdd9"></script>
+    <script src="assets/scrollspy.js?v=66bf87bdd9"></script>
+    <script src="assets/codelabels.js?v=66bf87bdd9"></script>
+    <script src="assets/github.js?v=66bf87bdd9"></script>
     <script>
 (function() {
     var toggle = document.getElementById('sidebar-toggle');
@@ -1002,5 +967,6 @@
     }
 })();
 </script>
+<!-- generated by pi-docsite -->
 </body>
 </html>

@@ -29,6 +29,7 @@ class CDIConfig(Resource):
         scratch_space_storage_class: str | None = None,
         tls_security_profile: dict[str, Any] | None = None,
         upload_proxy_url_override: str | None = None,
+        webhook_pvc_rendering: str | None = None,
         **kwargs: Any,
     ) -> None:
         r"""
@@ -41,7 +42,7 @@ class CDIConfig(Resource):
 
             filesystem_overhead (dict[str, Any]): FilesystemOverhead describes the space reserved for overhead when
               using Filesystem volumes. A value is between 0 and 1, if not
-              defined it is 0.055 (5.5% overhead)
+              defined it is 0.06 (6% overhead)
 
             image_pull_secrets (list[Any]): The imagePullSecrets used to pull the container images
 
@@ -69,6 +70,10 @@ class CDIConfig(Resource):
 
             upload_proxy_url_override (str): Override the URL used when uploading to a DataVolume
 
+            webhook_pvc_rendering (str): WebhookPvcRendering controls whether the PVC mutating webhook that
+              completes PVC specs from StorageProfiles is enabled or disabled
+              Allowed values are "Enabled" (default) and "Disabled"
+
         """
         super().__init__(**kwargs)
 
@@ -84,8 +89,10 @@ class CDIConfig(Resource):
         self.scratch_space_storage_class = scratch_space_storage_class
         self.tls_security_profile = tls_security_profile
         self.upload_proxy_url_override = upload_proxy_url_override
+        self.webhook_pvc_rendering = webhook_pvc_rendering
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
@@ -127,6 +134,9 @@ class CDIConfig(Resource):
 
             if self.upload_proxy_url_override is not None:
                 _spec["uploadProxyURLOverride"] = self.upload_proxy_url_override
+
+            if self.webhook_pvc_rendering is not None:
+                _spec["webhookPvcRendering"] = self.webhook_pvc_rendering
 
     # End of generated code
 

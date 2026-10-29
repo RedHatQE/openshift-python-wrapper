@@ -1,13 +1,3 @@
-Let me explore the repository structure and key files to understand the codebase before writing the documentation.
-
-Now let me look at the `NamespacedResource` class and the `get` classmethod for listing resources:
-
-Now let me check the `get_client` with the `utils/client_config.py` for understanding connection options:
-
-Now I have a thorough understanding of the codebase. Let me write the documentation:
-
-Now I have a comprehensive understanding of the codebase. Let me write the guide:
-
 # Installing and Creating Your First Resource
 
 Get up and running with openshift-python-wrapper so you can programmatically create, query, and delete Kubernetes and OpenShift resources from Python. This guide takes you from installation to your first working resource in under 5 minutes.

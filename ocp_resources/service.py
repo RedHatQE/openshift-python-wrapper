@@ -264,9 +264,8 @@ class Service(NamespacedResource):
               use this field as a hint, but are not required to guarantee strict
               adherence. If the field is not set, the implementation will apply
               its default routing strategy. If set to "PreferClose",
-              implementations should prioritize endpoints that are topologically
-              close (e.g., same zone). This is a beta field and requires
-              enabling ServiceTrafficDistribution feature.
+              implementations should prioritize endpoints that are in the same
+              zone.
 
             type (str): type determines how the Service is exposed. Defaults to ClusterIP.
               Valid options are ExternalName, ClusterIP, NodePort, and
@@ -319,6 +318,7 @@ class Service(NamespacedResource):
         self.type = type
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:

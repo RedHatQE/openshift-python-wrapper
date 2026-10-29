@@ -8,7 +8,8 @@ from ocp_resources.resource import Resource
 
 class Config(Resource):
     """
-       Config contains the configuration and detailed condition status for the Samples Operator.
+        Config contains the configuration and detailed condition status for the Samples Operator.
+
     Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
     """
 
@@ -19,6 +20,7 @@ class Config(Resource):
         architectures: list[Any] | None = None,
         management_state: str | None = None,
         samples_registry: str | None = None,
+        skipped_helm_charts: list[Any] | None = None,
         skipped_imagestreams: list[Any] | None = None,
         skipped_templates: list[Any] | None = None,
         **kwargs: Any,
@@ -45,6 +47,25 @@ class Config(Resource):
               pulled into this github repository, but based on our pulling only
               ocp content it typically defaults to registry.redhat.io.
 
+            skipped_helm_charts (list[Any]): skippedHelmCharts specifies names of helm charts that should NOT be
+              managed. Admins can use this to allow them to delete content they
+              don’t want. They will still have to MANUALLY DELETE the content
+              but the operator will not recreate(or update) anything listed
+              here. Few examples of the name of helmcharts which can be skipped
+              are 'redhat-redhat-perl-imagestreams','redhat-redhat-nodejs-
+              imagestreams','redhat-nginx-imagestreams', 'redhat-redhat-ruby-
+              imagestreams','redhat-redhat-python-imagestreams','redhat-redhat-
+              php-imagestreams', 'redhat-httpd-imagestreams','redhat-redhat-
+              dotnet-imagestreams'. Rest of the names can be obtained from
+              openshift console --> helmcharts -->installed helmcharts. This
+              will display the list of all the 12 helmcharts(of
+              imagestreams)being installed by Samples Operator. The
+              skippedHelmCharts must be a valid Kubernetes resource name. May
+              contain only lowercase alphanumeric characters, hyphens and
+              periods, and each period separated segment must begin and end with
+              an alphanumeric character. It must be non-empty and at most 253
+              characters in length
+
             skipped_imagestreams (list[Any]): skippedImagestreams specifies names of image streams that should NOT
               be created/updated.  Admins can use this to allow them to delete
               content they don’t want.  They will still have to manually delete
@@ -63,10 +84,12 @@ class Config(Resource):
         self.architectures = architectures
         self.management_state = management_state
         self.samples_registry = samples_registry
+        self.skipped_helm_charts = skipped_helm_charts
         self.skipped_imagestreams = skipped_imagestreams
         self.skipped_templates = skipped_templates
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
@@ -81,6 +104,9 @@ class Config(Resource):
 
             if self.samples_registry is not None:
                 _spec["samplesRegistry"] = self.samples_registry
+
+            if self.skipped_helm_charts is not None:
+                _spec["skippedHelmCharts"] = self.skipped_helm_charts
 
             if self.skipped_imagestreams is not None:
                 _spec["skippedImagestreams"] = self.skipped_imagestreams

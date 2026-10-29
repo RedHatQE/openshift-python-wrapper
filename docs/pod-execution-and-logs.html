@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Executing Commands in Pods and Retrieving Logs - openshift-python-wrapper</title>
     <meta name="description" content="Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls">
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/style.css?v=66bf87bdd9">
     <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
     <link rel="alternate" type="text/plain" title="LLM Documentation Index" href="llms.txt">
     <link rel="alternate" type="text/plain" title="LLM Full Documentation" href="llms-full.txt">
@@ -34,13 +34,6 @@
                             Installing and Creating Your First Resource
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">User Guides</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="connecting-to-clusters.html"
@@ -98,6 +91,13 @@
                         </a>
                     </li>
 
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Testing and Generation</h3>
+                <ul class="nav-group-pages">
+
                     <li>
                         <a href="testing-without-cluster.html"
                            class="nav-link">
@@ -112,11 +112,18 @@
                         </a>
                     </li>
 
+                    <li>
+                        <a href="class-generator-cli.html"
+                           class="nav-link">
+                            class-generator CLI Reference
+                        </a>
+                    </li>
+
                 </ul>
             </div>
 
             <div class="nav-group">
-                <h3 class="nav-group-title">Recipes</h3>
+                <h3 class="nav-group-title">Guides</h3>
                 <ul class="nav-group-pages">
 
                     <li>
@@ -148,25 +155,11 @@
                     </li>
 
                     <li>
-                        <a href="class-generator-cli.html"
-                           class="nav-link">
-                            class-generator CLI Reference
-                        </a>
-                    </li>
-
-                    <li>
                         <a href="environment-variables.html"
                            class="nav-link">
                             Environment Variables and Configuration
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Internals</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="resource-class-hierarchy.html"
@@ -182,13 +175,6 @@
                         </a>
                     </li>
 
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Using Resources</h3>
-                <ul class="nav-group-pages">
-
                     <li>
                         <a href="working-with-events.html"
                            class="nav-link">
@@ -202,13 +188,6 @@
                             Executing Commands in Pods and Retrieving Logs
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">API Reference</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="error-handling.html"
@@ -238,8 +217,8 @@
                 <button class="top-bar-search-btn" id="search-trigger" aria-label="Search">
                     <kbd>&#8984;K</kbd> Search
                 </button>
-                <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener" class="docsfy-badge" title="Generated with docsfy">
-                    ⚡ docs<span class="brand-accent">fy</span>
+                <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener" class="docsite-badge" title="documentation">
+                    ⚡ pi<span class="brand-accent">-docsite</span>
                 </a>
 
                 <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener noreferrer" class="top-bar-github" id="github-link" data-repo-url="https://github.com/RedHatQE/openshift-python-wrapper">
@@ -266,13 +245,7 @@
                          converted to HTML server-side by the markdown library, not
                          user-supplied input. XSS risk is minimal and accepted since
                          the AI generates the content, not end users. -->
-                    <p>Let me explore the repository structure and understand the codebase first.</p>
-<p>Now let me check the <code>read_namespaced_pod_log</code> kwargs available, and look at how the MCP server uses log parameters:</p>
-<p>Now let me check the import paths and verify the <code>get_client</code> function:</p>
-<p>Now let me check test files for pod execution tests:</p>
-<p>Now let me also verify whether the Node class has a <code>name</code> property:</p>
-<p>Now I have all the information I need to write the documentation. Let me compose it:</p>
-<h1 id="executing-commands-in-pods-and-retrieving-logs">Executing Commands in Pods and Retrieving Logs</h1>
+                    <h1 id="executing-commands-in-pods-and-retrieving-logs">Executing Commands in Pods and Retrieving Logs</h1>
 <p>Run commands inside running pods and retrieve their logs to debug and interact with workloads on your OpenShift or Kubernetes cluster.</p>
 <h2 id="prerequisites">Prerequisites</h2>
 <ul>
@@ -284,11 +257,11 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_client</span>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
-<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-app&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-app"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
 
 <span class="c1"># Run a command inside the pod</span>
-<span class="n">output</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;echo&quot;</span><span class="p">,</span> <span class="s2">&quot;hello&quot;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>  <span class="c1"># &quot;hello\n&quot;</span>
+<span class="n">output</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">"echo"</span><span class="p">,</span> <span class="s2">"hello"</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>  <span class="c1"># "hello\n"</span>
 
 <span class="c1"># Get pod logs</span>
 <span class="n">logs</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>
@@ -301,12 +274,12 @@
 <div class="highlight"><pre><span></span><code><span class="n">Pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
     <span class="n">command</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span>
-    <span class="n">container</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">container</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
     <span class="n">ignore_rc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
 </code></pre></div>
 
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -341,7 +314,7 @@
 <td>When <code>True</code>, return stdout even if the command exits with a non-zero return code</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Returns:</strong> <code>str</code> — the standard output of the command.</p>
 <p><strong>Raises:</strong> <code>ExecOnPodError</code> — when the command fails (non-zero exit code) and <code>ignore_rc</code> is <code>False</code>.</p>
 <h3 id="step-by-step-running-a-simple-command">Step-by-Step: Running a Simple Command</h3>
@@ -352,30 +325,30 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_client</span>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
-<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-app&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">)</span>
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-app"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">)</span>
 </code></pre></div>
 
 <ol>
 <li>Execute a command:</li>
 </ol>
-<div class="highlight"><pre><span></span><code><span class="n">output</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cat&quot;</span><span class="p">,</span> <span class="s2">&quot;/etc/hostname&quot;</span><span class="p">])</span>
+<div class="highlight"><pre><span></span><code><span class="n">output</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">"cat"</span><span class="p">,</span> <span class="s2">"/etc/hostname"</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
 </code></pre></div>
 
 <ol>
 <li>Use the result for further logic:</li>
 </ol>
-<div class="highlight"><pre><span></span><code><span class="n">files</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ls&quot;</span><span class="p">,</span> <span class="s2">&quot;/app/data&quot;</span><span class="p">])</span>
-<span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">files</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found: </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">files</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">"ls"</span><span class="p">,</span> <span class="s2">"/app/data"</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">files</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Found: </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="selecting-a-container">Selecting a Container</h3>
 <p>For multi-container pods, specify which container to run the command in. If you omit <code>container</code>, the first container defined in the pod spec is used.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Execute in a specific container</span>
 <span class="n">output</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-    <span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cat&quot;</span><span class="p">,</span> <span class="s2">&quot;/var/log/app.log&quot;</span><span class="p">],</span>
-    <span class="n">container</span><span class="o">=</span><span class="s2">&quot;sidecar&quot;</span><span class="p">,</span>
+    <span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">"cat"</span><span class="p">,</span> <span class="s2">"/var/log/app.log"</span><span class="p">],</span>
+    <span class="n">container</span><span class="o">=</span><span class="s2">"sidecar"</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -383,7 +356,7 @@
 <p>Long-running commands may need a longer timeout. The default is 60 seconds.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Allow up to 5 minutes for a heavy operation</span>
 <span class="n">output</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-    <span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;pg_dump&quot;</span><span class="p">,</span> <span class="s2">&quot;mydb&quot;</span><span class="p">],</span>
+    <span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">"pg_dump"</span><span class="p">,</span> <span class="s2">"mydb"</span><span class="p">],</span>
     <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -391,15 +364,15 @@
 <p>When the timeout is exceeded, an <code>ExecOnPodError</code> is raised with the error message <code>"stream resp is closed"</code>.</p>
 <h3 id="ignoring-non-zero-exit-codes">Ignoring Non-Zero Exit Codes</h3>
 <p>Some commands return a non-zero exit code as part of normal operation (e.g., <code>grep</code> returns 1 when no match is found). Use <code>ignore_rc=True</code> to get the output regardless:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># grep returns exit code 1 when there&#39;s no match — don&#39;t treat that as an error</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># grep returns exit code 1 when there's no match — don't treat that as an error</span>
 <span class="n">output</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-    <span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;grep&quot;</span><span class="p">,</span> <span class="s2">&quot;ERROR&quot;</span><span class="p">,</span> <span class="s2">&quot;/var/log/app.log&quot;</span><span class="p">],</span>
+    <span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">"grep"</span><span class="p">,</span> <span class="s2">"ERROR"</span><span class="p">,</span> <span class="s2">"/var/log/app.log"</span><span class="p">],</span>
     <span class="n">ignore_rc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="k">if</span> <span class="n">output</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Errors found:&quot;</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Errors found:"</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No errors in logs&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"No errors in logs"</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="handling-errors-with-execonpoderror">Handling Errors with <code>ExecOnPodError</code></h3>
@@ -408,16 +381,16 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExecOnPodError</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ls&quot;</span><span class="p">,</span> <span class="s2">&quot;/nonexistent&quot;</span><span class="p">])</span>
+    <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">"ls"</span><span class="p">,</span> <span class="s2">"/nonexistent"</span><span class="p">])</span>
 <span class="k">except</span> <span class="n">ExecOnPodError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Command: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">cmd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>      <span class="c1"># [&#39;ls&#39;, &#39;/nonexistent&#39;]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Return code: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">rc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>   <span class="c1"># Non-zero exit code (or -1 for stream errors)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stdout: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">out</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>       <span class="c1"># Standard output captured before failure</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stderr: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>       <span class="c1"># Standard error or error channel details</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Command: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>  <span class="c1"># ['ls', '/nonexistent']</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Return code: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">rc</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>  <span class="c1"># Non-zero exit code (or -1 for stream errors)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Stdout: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">out</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>  <span class="c1"># Standard output captured before failure</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Stderr: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">err</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>  <span class="c1"># Standard error or error channel details</span>
 </code></pre></div>
 
 <p><code>ExecOnPodError</code> attributes:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Attribute</th>
@@ -447,7 +420,7 @@
 <td>Standard error output, or the Kubernetes error channel response</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <blockquote>
 <p><strong>Tip:</strong> For a complete list of all custom exceptions, see <a href="error-handling.html">Error Handling and Exception Reference</a>.</p>
 </blockquote>
@@ -460,7 +433,7 @@
 
 <h3 id="common-keyword-arguments">Common Keyword Arguments</h3>
 <p>Pass any parameter supported by the Kubernetes <code>read_namespaced_pod_log</code> API:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -490,10 +463,10 @@
 <td>Only return logs newer than this many seconds</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h3 id="examples">Examples</h3>
 <div class="highlight"><pre><span></span><code><span class="c1"># Get logs from a specific container</span>
-<span class="n">logs</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">container</span><span class="o">=</span><span class="s2">&quot;nginx&quot;</span><span class="p">)</span>
+<span class="n">logs</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">container</span><span class="o">=</span><span class="s2">"nginx"</span><span class="p">)</span>
 
 <span class="c1"># Get the last 50 lines</span>
 <span class="n">logs</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">tail_lines</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
@@ -501,8 +474,8 @@
 <span class="c1"># Get logs from the last 5 minutes</span>
 <span class="n">logs</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">since_seconds</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
 
-<span class="c1"># Get logs from a crashed container&#39;s previous instance</span>
-<span class="n">logs</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">container</span><span class="o">=</span><span class="s2">&quot;app&quot;</span><span class="p">,</span> <span class="n">previous</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># Get logs from a crashed container's previous instance</span>
+<span class="n">logs</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">container</span><span class="o">=</span><span class="s2">"app"</span><span class="p">,</span> <span class="n">previous</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 
 <h2 id="accessing-pod-properties">Accessing Pod Properties</h2>
@@ -514,9 +487,9 @@
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
 
-<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">label_selector</span><span class="o">=</span><span class="s2">&quot;app=my-app&quot;</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">label_selector</span><span class="o">=</span><span class="s2">"app=my-app"</span><span class="p">):</span>
     <span class="n">node</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">node</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pod </span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is running on node </span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Pod </span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is running on node </span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 
 <blockquote>
@@ -525,12 +498,12 @@
 <h3 id="getting-the-pod-ip-address">Getting the Pod IP Address</h3>
 <p>The <code>ip</code> property returns the pod's IP address from its status:</p>
 <div class="highlight"><pre><span></span><code><span class="n">pod_ip</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">ip</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pod IP: </span><span class="si">{</span><span class="n">pod_ip</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Pod IP: </span><span class="si">{</span><span class="n">pod_ip</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="getting-the-pod-status">Getting the Pod Status</h3>
 <p>The <code>status</code> property (inherited from the base resource class) returns the pod's phase:</p>
-<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pod status: </span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># e.g., &quot;Running&quot;, &quot;Pending&quot;, &quot;Succeeded&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Pod status: </span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>  <span class="c1"># e.g., "Running", "Pending", "Succeeded"</span>
 </code></pre></div>
 
 <h2 id="advanced-usage">Advanced Usage</h2>
@@ -542,25 +515,25 @@
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
 
-<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;production&quot;</span><span class="p">,</span> <span class="n">label_selector</span><span class="o">=</span><span class="s2">&quot;app=web&quot;</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"production"</span><span class="p">,</span> <span class="n">label_selector</span><span class="o">=</span><span class="s2">"app=web"</span><span class="p">):</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">uptime</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;uptime&quot;</span><span class="p">])</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">uptime</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">uptime</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">"uptime"</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">uptime</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">ExecOnPodError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: command failed — </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: command failed — </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="executing-in-multi-container-pods">Executing in Multi-Container Pods</h3>
 <p>When pods contain sidecar containers (e.g., logging or proxy containers), always specify the target container explicitly:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Main application container</span>
-<span class="n">app_output</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cat&quot;</span><span class="p">,</span> <span class="s2">&quot;/app/config.yaml&quot;</span><span class="p">],</span> <span class="n">container</span><span class="o">=</span><span class="s2">&quot;app&quot;</span><span class="p">)</span>
+<span class="n">app_output</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">"cat"</span><span class="p">,</span> <span class="s2">"/app/config.yaml"</span><span class="p">],</span> <span class="n">container</span><span class="o">=</span><span class="s2">"app"</span><span class="p">)</span>
 
 <span class="c1"># Envoy sidecar</span>
-<span class="n">proxy_stats</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;curl&quot;</span><span class="p">,</span> <span class="s2">&quot;localhost:15000/stats&quot;</span><span class="p">],</span> <span class="n">container</span><span class="o">=</span><span class="s2">&quot;istio-proxy&quot;</span><span class="p">)</span>
+<span class="n">proxy_stats</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">"curl"</span><span class="p">,</span> <span class="s2">"localhost:15000/stats"</span><span class="p">],</span> <span class="n">container</span><span class="o">=</span><span class="s2">"istio-proxy"</span><span class="p">)</span>
 
 <span class="c1"># Logs from each container</span>
-<span class="n">app_logs</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">container</span><span class="o">=</span><span class="s2">&quot;app&quot;</span><span class="p">,</span> <span class="n">tail_lines</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-<span class="n">proxy_logs</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">container</span><span class="o">=</span><span class="s2">&quot;istio-proxy&quot;</span><span class="p">,</span> <span class="n">tail_lines</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">app_logs</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">container</span><span class="o">=</span><span class="s2">"app"</span><span class="p">,</span> <span class="n">tail_lines</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">proxy_logs</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">container</span><span class="o">=</span><span class="s2">"istio-proxy"</span><span class="p">,</span> <span class="n">tail_lines</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="collecting-debug-information">Collecting Debug Information</h3>
@@ -570,25 +543,25 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_client</span>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
-<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-app&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-app"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
 
 <span class="n">debug_info</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;pod_name&quot;</span><span class="p">:</span> <span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-    <span class="s2">&quot;node&quot;</span><span class="p">:</span> <span class="n">pod</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-    <span class="s2">&quot;ip&quot;</span><span class="p">:</span> <span class="n">pod</span><span class="o">.</span><span class="n">ip</span><span class="p">,</span>
-    <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">pod</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
-    <span class="s2">&quot;logs_tail&quot;</span><span class="p">:</span> <span class="n">pod</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">tail_lines</span><span class="o">=</span><span class="mi">20</span><span class="p">),</span>
+    <span class="s2">"pod_name"</span><span class="p">:</span> <span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+    <span class="s2">"node"</span><span class="p">:</span> <span class="n">pod</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+    <span class="s2">"ip"</span><span class="p">:</span> <span class="n">pod</span><span class="o">.</span><span class="n">ip</span><span class="p">,</span>
+    <span class="s2">"status"</span><span class="p">:</span> <span class="n">pod</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+    <span class="s2">"logs_tail"</span><span class="p">:</span> <span class="n">pod</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">tail_lines</span><span class="o">=</span><span class="mi">20</span><span class="p">),</span>
 <span class="p">}</span>
 
 <span class="c1"># Safely attempt commands that might fail</span>
-<span class="k">for</span> <span class="n">cmd_name</span><span class="p">,</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="p">[(</span><span class="s2">&quot;env&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;env&quot;</span><span class="p">]),</span> <span class="p">(</span><span class="s2">&quot;df&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;df&quot;</span><span class="p">,</span> <span class="s2">&quot;-h&quot;</span><span class="p">]),</span> <span class="p">(</span><span class="s2">&quot;ps&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;ps&quot;</span><span class="p">,</span> <span class="s2">&quot;aux&quot;</span><span class="p">])]:</span>
+<span class="k">for</span> <span class="n">cmd_name</span><span class="p">,</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="p">[(</span><span class="s2">"env"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"env"</span><span class="p">]),</span> <span class="p">(</span><span class="s2">"df"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"df"</span><span class="p">,</span> <span class="s2">"-h"</span><span class="p">]),</span> <span class="p">(</span><span class="s2">"ps"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"ps"</span><span class="p">,</span> <span class="s2">"aux"</span><span class="p">])]:</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">debug_info</span><span class="p">[</span><span class="n">cmd_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="n">cmd</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">ExecOnPodError</span><span class="p">:</span>
-        <span class="n">debug_info</span><span class="p">[</span><span class="n">cmd_name</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;command failed&quot;</span>
+        <span class="n">debug_info</span><span class="p">[</span><span class="n">cmd_name</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"command failed"</span>
 
 <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">debug_info</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;--- </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> ---</span><span class="se">\n</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"--- </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> ---</span><span class="se">\n</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="using-pod-context-manager-for-temporary-pods">Using Pod Context Manager for Temporary Pods</h3>
@@ -600,16 +573,18 @@
 
 <span class="k">with</span> <span class="n">Pod</span><span class="p">(</span>
     <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;debug-pod&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
-    <span class="n">containers</span><span class="o">=</span><span class="p">[{</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;debug&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;registry.access.redhat.com/ubi9/ubi:latest&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;sleep&quot;</span><span class="p">,</span> <span class="s2">&quot;3600&quot;</span><span class="p">],</span>
-    <span class="p">}],</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"debug-pod"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">,</span>
+    <span class="n">containers</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"debug"</span><span class="p">,</span>
+            <span class="s2">"image"</span><span class="p">:</span> <span class="s2">"registry.access.redhat.com/ubi9/ubi:latest"</span><span class="p">,</span>
+            <span class="s2">"command"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"sleep"</span><span class="p">,</span> <span class="s2">"3600"</span><span class="p">],</span>
+        <span class="p">}</span>
+    <span class="p">],</span>
 <span class="p">)</span> <span class="k">as</span> <span class="n">pod</span><span class="p">:</span>
     <span class="n">pod</span><span class="o">.</span><span class="n">wait_for_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">Pod</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
-    <span class="n">output</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cat&quot;</span><span class="p">,</span> <span class="s2">&quot;/etc/os-release&quot;</span><span class="p">])</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">"cat"</span><span class="p">,</span> <span class="s2">"/etc/os-release"</span><span class="p">])</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
 <span class="c1"># Pod is automatically deleted when the context manager exits</span>
 </code></pre></div>
@@ -620,7 +595,7 @@
 <h2 id="troubleshooting">Troubleshooting</h2>
 <h3 id="execonpoderror-with-stream-resp-is-closed"><code>ExecOnPodError</code> with <code>"stream resp is closed"</code></h3>
 <p>This typically means the command timed out. Increase the <code>timeout</code> parameter:</p>
-<div class="highlight"><pre><span></span><code><span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;long-running-script.sh&quot;</span><span class="p">],</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">"long-running-script.sh"</span><span class="p">],</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="assertionerror-node-not-found-for-pod-name"><code>AssertionError: Node not found for pod &lt;name&gt;</code></h3>
@@ -724,10 +699,7 @@
 
         <footer class="page-footer">
 
-            <span class="footer-version">Generated from version 11.0.134</span>
-            <span class="footer-sep">&middot;</span>
-
-            Generated with <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener">docs<span class="brand-accent">fy</span></a>
+            Built from <code>docs/*.md</code> by <code>pi-docsite</code>
             <span class="footer-sep">&middot;</span>
             <span class="footer-llm">LLM-friendly: <a href="llms.txt">llms.txt</a> &middot; <a href="llms-full.txt">llms-full.txt</a></span>
         </footer>
@@ -735,13 +707,14 @@
 
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <script src="assets/theme.js"></script>
-    <script src="assets/search.js"></script>
-    <script src="assets/copy.js"></script>
-    <script src="assets/callouts.js"></script>
-    <script src="assets/scrollspy.js"></script>
-    <script src="assets/codelabels.js"></script>
-    <script src="assets/github.js"></script>
+    <script src="assets/theme.js?v=66bf87bdd9"></script>
+
+    <script src="assets/search.js?v=66bf87bdd9"></script>
+    <script src="assets/copy.js?v=66bf87bdd9"></script>
+    <script src="assets/callouts.js?v=66bf87bdd9"></script>
+    <script src="assets/scrollspy.js?v=66bf87bdd9"></script>
+    <script src="assets/codelabels.js?v=66bf87bdd9"></script>
+    <script src="assets/github.js?v=66bf87bdd9"></script>
     <script>
 (function() {
     var toggle = document.getElementById('sidebar-toggle');
@@ -787,5 +760,6 @@
     }
 })();
 </script>
+<!-- generated by pi-docsite -->
 </body>
 </html>

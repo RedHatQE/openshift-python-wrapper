@@ -45,7 +45,7 @@ class ValidatingAdmissionPolicy(Resource):
               error calling the webhook causes the admission to fail.  -
               `"Ignore"` means that an error calling the webhook is ignored.
 
-            match_conditions (list[Any]): MatchConditions is a list of conditions that must be met for a request
+            match_conditions (list[Any]): matchConditions is a list of conditions that must be met for a request
               to be validated. Match conditions filter requests that have
               already been matched by the rules, namespaceSelector, and
               objectSelector. An empty list of matchConditions matches all
@@ -66,12 +66,12 @@ class ValidatingAdmissionPolicy(Resource):
 
             param_kind (dict[str, Any]): ParamKind is a tuple of Group Kind and Version.
 
-            validations (list[Any]): Validations contain CEL expressions which is used to apply the
+            validations (list[Any]): validations contain CEL expressions which is used to apply the
               validation. Validations and AuditAnnotations may not both be
               empty; a minimum of one Validations or AuditAnnotations is
               required.
 
-            variables (list[Any]): Variables contain definitions of variables that can be used in
+            variables (list[Any]): variables contain definitions of variables that can be used in
               composition of other expressions. Each variable is defined as a
               named CEL expression. The variables defined here will be available
               under `variables` in other expressions of the policy except

@@ -1,31 +1,3 @@
-Let me start by exploring the repository structure and the knowledge graph.
-
-Now let me look at the test files for the fake client:
-
-Let me look at a few more test files to understand patterns used:
-
-Now let me look at how `get_client` works with `fake=True` and how resource classes use the client:
-
-Now let me look at a few more test examples to understand patterns:
-
-Now let me check how resources use the fake client and how `deploy`, `clean_up`, `update` work:
-
-Let me look at additional test files for more patterns - ConfigMap, events, and the configmap resource:
-
-Now let me check how watch and events are used, and how to use the lower-level API:
-
-Now let me check the `events` and `watch` implementation in the Resource class:
-
-Now let me look at a few more resource test files and the low-level API usage:
-
-Let me check for import paths and the `ocp_resources.resource` module to understand the public API:
-
-Let me check how the `wait_for_condition` and other resource methods work with the fake client:
-
-Now I have enough information to write the documentation page. Let me check a couple more things:
-
-Now I have all the information I need. Let me write the documentation page.
-
 # Testing Without a Cluster Using the Fake Client
 
 Write unit tests that create, read, update, and delete Kubernetes resources — including status checks, watch events, and custom CRDs — without connecting to a real cluster.
