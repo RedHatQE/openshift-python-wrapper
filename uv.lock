@@ -1467,7 +1467,7 @@ wheels = [
 
 [[package]]
 name = "openshift-python-wrapper"
-version = "4.22.1"
+version = "4.22.2"
 source = { editable = "." }
 dependencies = [
     { name = "anyio" },
