@@ -54,4 +54,4 @@ class Migration(NamespacedResource):
             })
 
             if self.cut_over:
-                self.res["spec"]["cutover"] = self.cut_over.strftime(format="%Y-%m-%dT%H:%M:%SZ")
+                self.res["spec"]["cutover"] = self.cut_over.strftime("%Y-%m-%dT%H:%M:%SZ")
