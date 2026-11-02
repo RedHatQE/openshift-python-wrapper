@@ -10,11 +10,16 @@
   "lockFileMaintenance": {
     "enabled": true
   },
-  "baseBranches": ["main", "v4.18", "v4.17", "v4.16"],
+  "baseBranches": ["main", "v4.20", "v4.21", "v4.22"],
   "ignoreDeps": ["kubernetes"],
   "packageRules": [
     {
-      "baseBranchList": ["v4.18", "v4.17", "v4.16"],
+      "matchManagers": ["pep621"],
+      "matchDepTypes": ["requires-python"],
+      "enabled": false
+    },
+    {
+      "baseBranchList": ["v4.20", "v4.21", "v4.22"],
       "enabled": false
     },
     {
