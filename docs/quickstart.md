@@ -4,7 +4,7 @@ Get up and running with openshift-python-wrapper so you can programmatically cre
 
 ## Prerequisites
 
-- Python 3.14
+- Python 3.11-3.14
 - Access to a Kubernetes or OpenShift cluster (with a valid kubeconfig)
 - `pip` or another Python package manager
 

@@ -31,7 +31,7 @@ A task is complete when ALL pass:
 
 ## Project
 
-- Stack: Python 3.14+, kubernetes-python-client, timeout-sampler, uv
+- Stack: Python 3.11-3.14 (requires-python >=3.11,<3.15), kubernetes-python-client, timeout-sampler, uv
 - Structure: `ocp_resources/` (resource wrappers), `tests/` (pytest), `class_generator/` (code gen), `fake_kubernetes_client/` (mock client)
 - Key deps: `kubernetes` (API client), `timeout-sampler` (polling), `openshift-python-utilities` (shared utils)
 - Docs: `examples/`, inline docstrings (Google style)
