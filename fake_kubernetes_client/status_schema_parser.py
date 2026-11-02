@@ -4,7 +4,7 @@ import gzip
 import json
 import os
 import random
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 
@@ -303,7 +303,7 @@ class StatusSchemaParser:
     def _generate_string_value(self, field_name: str, is_ready: bool = True) -> str:
         """Generate a string value based on field name"""
         if "time" in field_name.lower() or "timestamp" in field_name.lower():
-            return datetime.now(timezone.utc).isoformat()
+            return datetime.now(UTC).isoformat()
         elif field_name == "message":
             return "Resource is ready" if is_ready else "Resource is not ready"
         elif field_name == "reason":
@@ -425,14 +425,14 @@ class StatusSchemaParser:
                 {
                     "type": "Ready",
                     "status": "True",
-                    "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
+                    "lastTransitionTime": datetime.now(UTC).isoformat(),
                     "reason": "ResourceReady",
                     "message": "Resource is ready",
                 },
                 {
                     "type": "Available",
                     "status": "True",
-                    "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
+                    "lastTransitionTime": datetime.now(UTC).isoformat(),
                     "reason": "ResourceAvailable",
                     "message": "Resource is available",
                 },
@@ -442,14 +442,14 @@ class StatusSchemaParser:
                 {
                     "type": "Ready",
                     "status": "False",
-                    "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
+                    "lastTransitionTime": datetime.now(UTC).isoformat(),
                     "reason": "ResourceNotReady",
                     "message": "Resource is not ready",
                 },
                 {
                     "type": "Available",
                     "status": "False",
-                    "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
+                    "lastTransitionTime": datetime.now(UTC).isoformat(),
                     "reason": "ResourceUnavailable",
                     "message": "Resource is unavailable",
                 },

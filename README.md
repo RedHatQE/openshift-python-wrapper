@@ -28,6 +28,8 @@ Resource manifests and logs can be easily collected.
 
 ## Installation
 
+Requires Python 3.11-3.14.
+
 From source:
 
 ```bash

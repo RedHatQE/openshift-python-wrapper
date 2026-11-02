@@ -1,6 +1,6 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import kubernetes
@@ -146,9 +146,7 @@ class DaemonSet(NamespacedResource):
                 "spec": {
                     "template": {
                         "metadata": {
-                            "annotations": {
-                                "kubectl.kubernetes.io/restartedAt": datetime.now(tz=timezone.utc).isoformat()
-                            }
+                            "annotations": {"kubectl.kubernetes.io/restartedAt": datetime.now(tz=UTC).isoformat()}
                         }
                     }
                 },

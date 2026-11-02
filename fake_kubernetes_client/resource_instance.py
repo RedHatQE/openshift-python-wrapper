@@ -4,7 +4,7 @@ import copy
 import time
 import uuid
 from collections.abc import Iterator
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, Union
 
 from fake_kubernetes_client.exceptions import ConflictError, MethodNotAllowedError, NotFoundError
@@ -66,7 +66,7 @@ class FakeResourceInstance:
 
     def _generate_timestamp(self) -> str:
         """Generate current UTC timestamp in ISO format"""
-        return datetime.now(timezone.utc).isoformat()
+        return datetime.now(UTC).isoformat()
 
     def create(
         self, body: dict[str, Any] | None = None, namespace: str | None = None, **_kwargs: Any
@@ -208,7 +208,7 @@ class FakeResourceInstance:
                 "namespace": resource_namespace or "default",
                 "uid": str(uuid.uuid4()),
                 "resourceVersion": str(int(time.time() * 1000)),
-                "creationTimestamp": datetime.now(timezone.utc).isoformat(),
+                "creationTimestamp": datetime.now(UTC).isoformat(),
                 "generation": 1,
             },
             "involvedObject": {
@@ -222,8 +222,8 @@ class FakeResourceInstance:
             "reason": reason,
             "message": f"{resource_kind} {resource_name} has been {action}",
             "source": {"component": "fake-client", "host": "fake-cluster.example.com"},
-            "firstTimestamp": datetime.now(timezone.utc).isoformat(),
-            "lastTimestamp": datetime.now(timezone.utc).isoformat(),
+            "firstTimestamp": datetime.now(UTC).isoformat(),
+            "lastTimestamp": datetime.now(UTC).isoformat(),
             "count": 1,
             "type": "Normal",
         }
