@@ -2,7 +2,7 @@ minimum_pre_commit_version: 3.3.0
 default_install_hook_types: [pre-commit, commit-msg]
 
 default_language_version:
-  python: python3
+  python: python3.14
 
 ci:
   autofix_prs: false
