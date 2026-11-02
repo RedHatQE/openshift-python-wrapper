@@ -1,6 +1,6 @@
 import warnings
 from collections.abc import Generator
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from kubernetes.dynamic import DynamicClient
@@ -159,7 +159,7 @@ class Event:
         response = resource.get(**kwargs)
         events = response.items or []
 
-        cutoff = datetime.now(tz=timezone.utc) - timedelta(seconds=since_seconds)
+        cutoff = datetime.now(tz=UTC) - timedelta(seconds=since_seconds)
         timed_events: list[tuple[datetime, Any]] = []
         for event in events:
             event_time = cls._parse_timestamp(event)
