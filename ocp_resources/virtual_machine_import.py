@@ -164,7 +164,7 @@ class VirtualMachineImport(NamespacedResource):
             if self.warm:
                 spec["warm"] = self.warm
             if self.finalize_date:
-                spec["finalizeDate"] = self.finalize_date.strftime(format="%Y-%m-%dT%H:%M:%SZ")
+                spec["finalizeDate"] = self.finalize_date.strftime("%Y-%m-%dT%H:%M:%SZ")
 
             provider_source = spec.setdefault("source", {}).setdefault(self.provider_type, {})
             vm = provider_source.setdefault("vm", {})
