@@ -544,6 +544,7 @@ class Resource(ResourceConstants):
         MACHINECONFIGURATION_OPENSHIFT_IO: str = "machineconfiguration.openshift.io"
         MAISTRA_IO: str = "maistra.io"
         MCP_X_K8S_IO: str = "mcp.x-k8s.io"
+        METAL3_IO: str = "metal3.io"
         METALLB_IO: str = "metallb.io"
         METRICS_K8S_IO: str = "metrics.k8s.io"
         MIGRATION_OPENSHIFT_IO: str = "migration.openshift.io"
