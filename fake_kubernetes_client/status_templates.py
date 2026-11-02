@@ -1,6 +1,6 @@
 """Status template methods for fake Kubernetes resources"""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from fake_kubernetes_client.status_schema_parser import StatusSchemaParser
@@ -99,7 +99,7 @@ def get_pod_status_template(body: dict[str, Any]) -> dict[str, Any]:
     ready_message = "All containers are ready"
     container_ready = True
     container_started = True
-    container_state = {"running": {"startedAt": datetime.now(timezone.utc).isoformat()}}
+    container_state = {"running": {"startedAt": datetime.now(UTC).isoformat()}}
 
     # Check pod-specific annotation first
     if "fake-client.io/pod-ready" in annotations:
@@ -133,7 +133,7 @@ def get_pod_status_template(body: dict[str, Any]) -> dict[str, Any]:
             ready_message = "All containers are ready"
             container_ready = True
             container_started = True
-            container_state = {"running": {"startedAt": datetime.now(timezone.utc).isoformat()}}
+            container_state = {"running": {"startedAt": datetime.now(UTC).isoformat()}}
 
     return {
         "phase": "Running",
@@ -142,14 +142,14 @@ def get_pod_status_template(body: dict[str, Any]) -> dict[str, Any]:
                 "type": "Initialized",
                 "status": "True",
                 "lastProbeTime": None,
-                "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
+                "lastTransitionTime": datetime.now(UTC).isoformat(),
                 "reason": "PodCompleted",
             },
             {
                 "type": "Ready",
                 "status": ready_status,  # Now configurable, defaults to True
                 "lastProbeTime": None,
-                "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
+                "lastTransitionTime": datetime.now(UTC).isoformat(),
                 "reason": ready_reason,
                 "message": ready_message,
             },
@@ -157,7 +157,7 @@ def get_pod_status_template(body: dict[str, Any]) -> dict[str, Any]:
                 "type": "ContainersReady",
                 "status": ready_status,  # Should match Ready status
                 "lastProbeTime": None,
-                "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
+                "lastTransitionTime": datetime.now(UTC).isoformat(),
                 "reason": ready_reason,
                 "message": ready_message,
             },
@@ -165,14 +165,14 @@ def get_pod_status_template(body: dict[str, Any]) -> dict[str, Any]:
                 "type": "PodScheduled",
                 "status": "True",
                 "lastProbeTime": None,
-                "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
+                "lastTransitionTime": datetime.now(UTC).isoformat(),
                 "reason": "PodScheduled",
             },
         ],
         "hostIP": "10.0.0.1",
         "podIP": "10.244.0.2",
         "podIPs": [{"ip": "10.244.0.2"}],
-        "startTime": datetime.now(timezone.utc).isoformat(),
+        "startTime": datetime.now(UTC).isoformat(),
         "containerStatuses": [
             {
                 "name": container_name,
@@ -207,16 +207,16 @@ def get_deployment_status_template(body: dict[str, Any]) -> dict[str, Any]:
                 {
                     "type": "Available",
                     "status": "True",
-                    "lastUpdateTime": datetime.now(timezone.utc).isoformat(),
-                    "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
+                    "lastUpdateTime": datetime.now(UTC).isoformat(),
+                    "lastTransitionTime": datetime.now(UTC).isoformat(),
                     "reason": "MinimumReplicasAvailable",
                     "message": "Deployment has minimum availability.",
                 },
                 {
                     "type": "Progressing",
                     "status": "True",
-                    "lastUpdateTime": datetime.now(timezone.utc).isoformat(),
-                    "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
+                    "lastUpdateTime": datetime.now(UTC).isoformat(),
+                    "lastTransitionTime": datetime.now(UTC).isoformat(),
                     "reason": "NewReplicaSetAvailable",
                     "message": "ReplicaSet has successfully progressed.",
                 },
@@ -235,16 +235,16 @@ def get_deployment_status_template(body: dict[str, Any]) -> dict[str, Any]:
                 {
                     "type": "Available",
                     "status": "False",
-                    "lastUpdateTime": datetime.now(timezone.utc).isoformat(),
-                    "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
+                    "lastUpdateTime": datetime.now(UTC).isoformat(),
+                    "lastTransitionTime": datetime.now(UTC).isoformat(),
                     "reason": "MinimumReplicasUnavailable",
                     "message": "Deployment does not have minimum availability.",
                 },
                 {
                     "type": "Progressing",
                     "status": "False",
-                    "lastUpdateTime": datetime.now(timezone.utc).isoformat(),
-                    "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
+                    "lastUpdateTime": datetime.now(UTC).isoformat(),
+                    "lastTransitionTime": datetime.now(UTC).isoformat(),
                     "reason": "ProgressDeadlineExceeded",
                     "message": "ReplicaSet has timed out progressing.",
                 },
@@ -270,14 +270,14 @@ def get_namespace_status_template(body: dict[str, Any]) -> dict[str, Any]:
                 {
                     "type": "NamespaceDeletionDiscoveryFailure",
                     "status": "False",
-                    "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
+                    "lastTransitionTime": datetime.now(UTC).isoformat(),
                     "reason": "ResourcesDiscovered",
                     "message": "All resources successfully discovered",
                 },
                 {
                     "type": "NamespaceDeletionContentFailure",
                     "status": "False",
-                    "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
+                    "lastTransitionTime": datetime.now(UTC).isoformat(),
                     "reason": "ContentDeleted",
                     "message": "All content successfully deleted",
                 },
@@ -291,14 +291,14 @@ def get_namespace_status_template(body: dict[str, Any]) -> dict[str, Any]:
                 {
                     "type": "NamespaceDeletionDiscoveryFailure",
                     "status": "True",
-                    "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
+                    "lastTransitionTime": datetime.now(UTC).isoformat(),
                     "reason": "DiscoveryFailed",
                     "message": "Discovery failed for some resources",
                 },
                 {
                     "type": "NamespaceDeletionContentFailure",
                     "status": "True",
-                    "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
+                    "lastTransitionTime": datetime.now(UTC).isoformat(),
                     "reason": "ContentDeletionFailed",
                     "message": "Failed to delete all content",
                 },
@@ -316,7 +316,7 @@ def get_generic_status_template(body: dict[str, Any]) -> dict[str, Any]:
             {
                 "type": "Ready",
                 "status": ready_status,
-                "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
+                "lastTransitionTime": datetime.now(UTC).isoformat(),
                 "reason": ready_reason,
                 "message": ready_message,
             }
