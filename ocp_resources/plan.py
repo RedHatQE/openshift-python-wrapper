@@ -43,6 +43,9 @@ class Plan(NamespacedResource):
                                       should be added to the target VM resource.
         target_affinity (dict, optional): Affinity rules for the target VM. Specifies which affinity
                                         rules should be applied to the target VM resource.
+        convertor_labels (dict[str, str], optional): Labels applied to virt-v2v conversion pods.
+        convertor_affinity (dict, optional): Affinity rules for virt-v2v conversion pods. Follows the standard
+                                            Kubernetes affinity structure.
         enable_nested_virtualization (bool, optional): Whether to enable nested virtualization on migrated VMs.
                                                       When False, CPU features vmx/svm are disabled on the target VM.
         run_preflight_inspection (bool, optional): Whether to run preflight deep inspection on warm migrations.
@@ -97,6 +100,8 @@ class Plan(NamespacedResource):
         scsi_reservation: bool | None = None,
         convertor_node_selector: dict[str, str] | None = None,
         pre_copy_source_disks: bool | None = None,
+        convertor_labels: dict[str, str] | None = None,
+        convertor_affinity: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -131,6 +136,8 @@ class Plan(NamespacedResource):
         self.convertor_node_selector = convertor_node_selector
         self.target_labels = target_labels
         self.target_affinity = target_affinity
+        self.convertor_labels = convertor_labels
+        self.convertor_affinity = convertor_affinity
         self.enable_nested_virtualization = enable_nested_virtualization
         self.run_preflight_inspection = run_preflight_inspection
         self.rdm_as_lun = rdm_as_lun
@@ -237,6 +244,12 @@ class Plan(NamespacedResource):
 
             if self.target_affinity is not None:
                 spec["targetAffinity"] = self.target_affinity
+
+            if self.convertor_labels is not None:
+                spec["convertorLabels"] = self.convertor_labels
+
+            if self.convertor_affinity is not None:
+                spec["convertorAffinity"] = self.convertor_affinity
 
             if self.enable_nested_virtualization is not None:
                 spec["enableNestedVirtualization"] = self.enable_nested_virtualization
