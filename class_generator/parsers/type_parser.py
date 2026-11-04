@@ -161,11 +161,13 @@ def prepare_property_dict(
         Updated resource dictionary
     """
     keys_to_ignore: list[str] = ["kind", "apiVersion", "status"]
+    # Fields renamed to avoid colliding with base Resource attributes (api_version is the resource's own
+    # apiVersion, node_selector is the base class pod-placement kwarg)
     keys_to_rename: set[str] = {"annotations", "labels"}
     if dict_key != SPEC_STR.lower():
         keys_to_ignore.extend(["metadata", SPEC_STR.lower()])
     else:
-        keys_to_rename |= {SPEC_STR.lower()}
+        keys_to_rename |= {SPEC_STR.lower(), "api_version", "node_selector"}
 
     for key, val in schema.items():
         if key in keys_to_ignore:
