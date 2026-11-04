@@ -17,7 +17,9 @@ class MissingClientError(TypeError):
     """
 
     def __str__(self) -> str:
-        return "client is required. Pass a DynamicClient from get_client() or get_client(fake=True)."
+        return (
+            super().__str__() or "client is required. Pass a DynamicClient from get_client() or get_client(fake=True)."
+        )
 
 
 class MissingResourceError(Exception):

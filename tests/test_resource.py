@@ -130,10 +130,11 @@ class TestResource:
         pod = Pod(client=fake_client, name=BASE_POD_NAME, namespace="default", containers=POD_CONTAINERS)
         assert pod.client is fake_client
 
-    def test_removed_client_kwargs_rejected(self, fake_client: FakeDynamicClient) -> None:
-        # Callers do `except TypeError`, so the exception must stay a TypeError subclass
+    def test_missing_client_error_is_type_error_subclass(self) -> None:
+        """Callers do `except TypeError`, so the exception must stay a TypeError subclass."""
         assert issubclass(MissingClientError, TypeError)
 
+    def test_removed_client_kwargs_rejected(self, fake_client: FakeDynamicClient) -> None:
         with pytest.raises(TypeError, match="Unsupported argument"):
             Namespace.get(client=fake_client, dyn_client=fake_client)
 

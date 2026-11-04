@@ -1477,8 +1477,9 @@ class Resource(ResourceConstants):
             TypeError: If removed client kwargs (dyn_client, config_file, config_dict, context)
                 are passed, or if a positional argument is passed.
 
-        Yields:
-            kubernetes.dynamic.resource.ResourceField: Cluster resource.
+        Returns:
+            generator: Yields kubernetes.dynamic.resource.ResourceField cluster resources; the
+                client is validated before iteration starts.
 
         Example:
             for resource in get_all_cluster_resources(client=client, label_selector="my-label=value"):
@@ -1664,8 +1665,8 @@ class NamespacedResource(Resource):
             delete_timeout: Timeout associated with delete action.
             ensure_exists: Whether to check if the resource exists before when initializing the resource, raise if not.
             **kwargs: Forwarded to `Resource.__init__`, which rejects removed client kwargs
-                (dyn_client, config_file, config_dict, context) and unknown arguments, naming the
-                instantiated class.
+                (dyn_client, config_file, config_dict, context) with a migration hint, and rejects
+                unknown arguments with an error naming the instantiated class.
 
         Raises:
             TypeError: If removed client kwargs (dyn_client, config_file, config_dict, context)

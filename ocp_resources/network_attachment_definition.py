@@ -73,7 +73,7 @@ class BridgeNetworkAttachmentDefinition(NetworkAttachmentDefinition):
         mtu: int | None = None,
         macspoofchk: bool | None = None,
         teardown: bool = True,
-        old_nad_format: bool | None = False,
+        old_nad_format: bool = False,
         add_resource_name: bool = True,
         dry_run: bool | None = None,
         **kwargs: Any,
@@ -197,12 +197,12 @@ class OvsBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
 class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
     def __init__(
         self,
-        network_name=None,
-        topology=None,
-        vlan=None,
-        mtu=None,
-        **kwargs,
-    ):
+        network_name: str | None = None,
+        topology: str | None = None,
+        vlan: int | None = None,
+        mtu: str | None = None,
+        **kwargs: Any,
+    ) -> None:
         """
         Create and manage an OVN k8s overlay NetworkAttachmentDefinition (a switched, layer 2, topology network).
 
