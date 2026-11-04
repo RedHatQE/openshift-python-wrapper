@@ -64,10 +64,15 @@ def demo_auto_validation():
     """Demonstrate automatic validation during create"""
     print_section(title="Auto-validation During Create")
 
+    # This demo creates pods, so it needs its own fake client: reusing the shared
+    # FAKE_CLIENT would leave 'auto-validated-pod' behind and a second run of the
+    # demo would fail with a conflict instead of showing successful validation.
+    client = get_client(fake=True)
+
     # Create pod with auto-validation enabled
     print("1. Creating pod with auto-validation enabled...")
     pod = Pod(
-        client=FAKE_CLIENT,
+        client=client,
         name="auto-validated-pod",
         namespace="default",
         containers=[{"name": "nginx", "image": "nginx:latest"}],
@@ -83,7 +88,7 @@ def demo_auto_validation():
     # Try to create invalid pod with auto-validation
     print("\n2. Creating invalid pod with auto-validation...")
     invalid_pod = Pod(
-        client=FAKE_CLIENT,
+        client=client,
         name="invalid-auto-pod",
         namespace="default",
         containers=[{"name": "nginx"}],  # Missing image
