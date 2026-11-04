@@ -1300,7 +1300,7 @@ wheels = [
 
 [[package]]
 name = "openshift-python-wrapper"
-version = "11.0.149"
+version = "5.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "authlib" },
