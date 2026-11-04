@@ -38,7 +38,7 @@ def case_1_missing_required_fields():
     print("Problem code:")
     print("""
     pod = Pod(
-        client=client,
+        client=FAKE_CLIENT,
         name="my-pod",
         namespace="default",
         containers=[{"name": "nginx"}]  # Missing 'image'
@@ -56,7 +56,7 @@ def case_1_missing_required_fields():
     print("Fixed code:")
     print("""
     pod = Pod(
-        client=client,
+        client=FAKE_CLIENT,
         name="my-pod",
         namespace="default",
         containers=[{
@@ -124,7 +124,7 @@ def case_3_invalid_field_values():
     print("Problem code:")
     print("""
     pod = Pod(
-        client=client,
+        client=FAKE_CLIENT,
         name="My-Pod-123",  # Capital letters not allowed
         namespace="default"
     )
@@ -146,7 +146,7 @@ def case_3_invalid_field_values():
     print("Fixed code:")
     print("""
     pod = Pod(
-        client=client,
+        client=FAKE_CLIENT,
         name="my-pod-123",  # Valid DNS name
         namespace="default"
     )
@@ -163,7 +163,7 @@ def case_4_invalid_structure():
     print("Problem code:")
     print("""
     service = Service(
-        client=client,
+        client=FAKE_CLIENT,
         name="my-service",
         namespace="default",
         selector={"app": "nginx"},
@@ -191,7 +191,7 @@ def case_4_invalid_structure():
     print("Fixed code:")
     print("""
     service = Service(
-        client=client,
+        client=FAKE_CLIENT,
         name="my-service",
         namespace="default",
         selector={"app": "nginx"},

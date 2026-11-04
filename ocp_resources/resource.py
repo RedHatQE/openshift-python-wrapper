@@ -42,6 +42,7 @@ from ocp_resources.event import Event
 from ocp_resources.exceptions import (
     ClientWithBasicAuthError,
     ConditionError,
+    MissingClientError,
     MissingRequiredArgumentError,
     MissingResourceResError,
     ResourceTeardownError,
@@ -638,8 +639,9 @@ class Resource(ResourceConstants):
 
     def __init__(
         self,
-        client: DynamicClient,
         name: str | None = None,
+        *,
+        client: DynamicClient,
         teardown: bool = True,
         yaml_file: str | None = None,
         delete_timeout: int = TIMEOUT_4MINUTES,
@@ -654,6 +656,7 @@ class Resource(ResourceConstants):
         kind_dict: dict[Any, Any] | None = None,
         wait_for_resource: bool = False,
         schema_validation_enabled: bool = False,
+        **kwargs: Any,
     ) -> None:
         """
         Create an API resource.
@@ -661,8 +664,9 @@ class Resource(ResourceConstants):
         If `yaml_file` or `kind_dict` are passed, logic in `to_dict` is bypassed.
 
         Args:
-            client: Dynamic client for connecting to a remote cluster.
             name: Resource name.
+            client: Mandatory dynamic client for connecting to a remote cluster.
+                Obtain it from `get_client()` (or `get_client(fake=True)` in tests).
             teardown: Indicates if this resource would need to be deleted.
             yaml_file: Yaml file for the resource.
             delete_timeout: Timeout associated with delete action.
@@ -679,18 +683,25 @@ class Resource(ResourceConstants):
             wait_for_resource: Waits for the resource to be created.
             schema_validation_enabled: Enable automatic schema validation for this instance.
                 Defaults to False. Set to True to validate on create/update operations.
+            **kwargs: Must be empty; removed client kwargs and unknown arguments are rejected.
 
         Raises:
             ValueError: If both yaml_file and kind_dict are provided.
-            TypeError: If client is None.
+            TypeError: If removed client kwargs (dyn_client, config_file, config_dict, context)
+                or unknown keyword arguments are passed.
+            MissingClientError: If client is None.
             NotImplementedError: If neither api_group nor api_version is defined on the class.
             MissingRequiredArgumentError: If name is missing when yaml_file and kind_dict are not set.
         """
+        _reject_removed_client_kwargs(kwargs)
+        if kwargs:
+            raise TypeError(f"{type(self).__name__}() got unexpected keyword argument(s): {', '.join(sorted(kwargs))}")
+
         if yaml_file and kind_dict:
             raise ValueError("yaml_file and resource_dict are mutually exclusive")
 
         if client is None:
-            raise TypeError("client is required")
+            raise MissingClientError()
 
         self.name = name
         self.teardown = teardown
@@ -1209,16 +1220,21 @@ class Resource(ResourceConstants):
         Get resources
 
         Args:
-            client (DynamicClient): k8s client
+            client (DynamicClient): Mandatory k8s client; obtain it from get_client().
             singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource.
             raw (bool): If True return raw object.
             exceptions_dict (dict): Exceptions dict for TimeoutSampler
 
         Returns:
             generator: Generator of Resources of cls.kind.
+
+        Raises:
+            MissingClientError: If client is None.
+            TypeError: If removed client kwargs (dyn_client, config_file, config_dict, context)
+                are passed.
         """
         if client is None:
-            raise TypeError("client is required")
+            raise MissingClientError()
         _reject_removed_client_kwargs(kwargs)
 
         def _get() -> Generator["Resource|ResourceInstance", None, None]:
@@ -1446,15 +1462,22 @@ class Resource(ResourceConstants):
     @staticmethod
     def get_all_cluster_resources(
         client: DynamicClient,
-        *args: Any,
         **kwargs: Any,
     ) -> Generator[ResourceField, None, None]:
         """
         Get all cluster resources
 
         Args:
-            client (DynamicClient): k8s client
+            client (DynamicClient): Mandatory k8s client; obtain it from get_client().
             **kwargs (dict): kwargs to pass to client.get()
+
+        Returns:
+            generator: Generator of cluster resources.
+
+        Raises:
+            MissingClientError: If client is None.
+            TypeError: If removed client kwargs (dyn_client, config_file, config_dict, context)
+                are passed, or if a positional argument is passed.
 
         Yields:
             kubernetes.dynamic.resource.ResourceField: Cluster resource.
@@ -1464,20 +1487,19 @@ class Resource(ResourceConstants):
                 print(f"Resource: {resource}")
         """
         if client is None:
-            raise TypeError("client is required")
-        if args:
-            raise TypeError(
-                "get_all_cluster_resources() takes no positional arguments after client; use keyword arguments only"
-            )
+            raise MissingClientError()
         _reject_removed_client_kwargs(kwargs)
 
-        for _resource in client.resources.search():
-            try:
-                _resources = client.get(_resource, **kwargs)
-                yield from _resources.items
+        def _get_all_cluster_resources() -> Generator[ResourceField, None, None]:
+            for _resource in client.resources.search():
+                try:
+                    _resources = client.get(_resource, **kwargs)
+                    yield from _resources.items
 
-            except (NotFoundError, TypeError, MethodNotAllowedError):
-                continue
+                except (NotFoundError, TypeError, MethodNotAllowedError):
+                    continue
+
+        return _get_all_cluster_resources()
 
     def to_yaml(self) -> str:
         """
@@ -1621,15 +1643,40 @@ class NamespacedResource(Resource):
 
     def __init__(
         self,
-        client: DynamicClient,
         name: str | None = None,
         namespace: str | None = None,
+        *,
+        client: DynamicClient,
         teardown: bool = True,
         yaml_file: str | None = None,
         delete_timeout: int = TIMEOUT_4MINUTES,
         ensure_exists: bool = False,
         **kwargs: Any,
     ) -> None:
+        """
+        Create a namespaced API resource.
+
+        Args:
+            name: Resource name.
+            namespace: Resource namespace.
+            client: Mandatory dynamic client for connecting to a remote cluster.
+                Obtain it from `get_client()` (or `get_client(fake=True)` in tests).
+            teardown: Indicates if this resource would need to be deleted.
+            yaml_file: Yaml file for the resource.
+            delete_timeout: Timeout associated with delete action.
+            ensure_exists: Whether to check if the resource exists before when initializing the resource, raise if not.
+            **kwargs: Forwarded to `Resource.__init__`; removed client kwargs are rejected there
+                with the name of the instantiated class.
+
+        Raises:
+            TypeError: If removed client kwargs (dyn_client, config_file, config_dict, context)
+                or unknown keyword arguments are passed.
+            MissingClientError: If client is None.
+            MissingRequiredArgumentError: If name or namespace is missing when yaml_file and
+                kind_dict are not set.
+        """
+        _reject_removed_client_kwargs(kwargs)
+
         super().__init__(
             name=name,
             client=client,
@@ -1659,16 +1706,21 @@ class NamespacedResource(Resource):
         Get resources
 
         Args:
-            client (DynamicClient): k8s client
+            client (DynamicClient): Mandatory k8s client; obtain it from get_client().
             singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource.
             raw (bool): If True return raw object.
             exceptions_dict (dict): Exceptions dict for TimeoutSampler
 
         Returns:
             generator: Generator of Resources of cls.kind
+
+        Raises:
+            MissingClientError: If client is None.
+            TypeError: If removed client kwargs (dyn_client, config_file, config_dict, context)
+                are passed.
         """
         if client is None:
-            raise TypeError("client is required")
+            raise MissingClientError()
         _reject_removed_client_kwargs(kwargs)
 
         def _get() -> Generator["NamespacedResource|ResourceInstance", None, None]:

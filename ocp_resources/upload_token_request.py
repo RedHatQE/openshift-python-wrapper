@@ -13,7 +13,6 @@ class UploadTokenRequest(NamespacedResource):
         self,
         name=None,
         namespace=None,
-        client=None,
         pvc_name=None,
         teardown=True,
         yaml_file=None,
@@ -23,7 +22,6 @@ class UploadTokenRequest(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

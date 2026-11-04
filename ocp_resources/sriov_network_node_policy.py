@@ -17,7 +17,6 @@ class SriovNetworkNodePolicy(NamespacedResource):
         root_devices=None,
         num_vfs=None,
         resource_name=None,
-        client=None,
         priority=None,
         mtu=None,
         node_selector=None,
@@ -29,7 +28,6 @@ class SriovNetworkNodePolicy(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

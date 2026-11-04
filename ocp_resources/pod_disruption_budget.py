@@ -13,7 +13,6 @@ class PodDisruptionBudget(NamespacedResource):
         self,
         name=None,
         namespace=None,
-        client=None,
         min_available=None,
         max_unavailable=None,
         selector=None,
@@ -25,7 +24,6 @@ class PodDisruptionBudget(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

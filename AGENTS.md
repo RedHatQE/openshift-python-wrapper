@@ -58,7 +58,8 @@ Code between markers is auto-generated — do NOT modify manually. Use `class-ge
 
 ## When Writing Code
 
-- **Always pass `client` when instantiating a resource** — `client: DynamicClient` is required on `Resource` / `NamespacedResource` (and on `.get()` / `Event` APIs). Create it with `get_client()` (or `get_client(fake=True)` in tests); do not rely on implicit kubeconfig/client creation.
+- **Always pass `client` when instantiating a resource** — `client: DynamicClient` is a required keyword argument on `Resource` / `NamespacedResource` and required on their `.get()` / `get_all_cluster_resources()` methods, plus the `Event` APIs. Create it with `get_client()` (or `get_client(fake=True)` in tests); do not rely on implicit kubeconfig/client creation.
+- **`dyn_client`, `config_file`, `config_dict` and `context` are no longer accepted** on resource APIs — they raise `TypeError`. Pass them to `get_client()` instead.
 - No client-side validation in `to_dict()` — let the K8s/OCP API server return errors. Helper functions in resource classes CAN validate.
 - Context managers for auto-cleanup: `with Pod(client=client, name="test", namespace="default") as pod:`
 - Wait utilities: `wait_for_status()`, `wait_for_condition()` via timeout-sampler

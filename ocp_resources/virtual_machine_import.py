@@ -88,7 +88,6 @@ class VirtualMachineImport(NamespacedResource):
         provider_credentials_secret_name=None,
         provider_type=None,
         provider_credentials_secret_namespace=None,
-        client=None,
         teardown=True,
         vm_id=None,
         vm_name=None,
@@ -108,7 +107,6 @@ class VirtualMachineImport(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
@@ -242,7 +240,6 @@ class ResourceMapping(NamespacedResource):
         name=None,
         namespace=None,
         mapping=None,
-        client=None,
         teardown=True,
         yaml_file=None,
         **kwargs,
@@ -250,7 +247,6 @@ class ResourceMapping(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             **kwargs,

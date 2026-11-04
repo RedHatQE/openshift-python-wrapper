@@ -10,6 +10,16 @@ class MissingRequiredArgumentError(Exception):
         return f"Missing required argument/s. Either provide yaml_file, kind_dict or pass {self.argument}"
 
 
+class MissingClientError(TypeError):
+    """Raised when a Resource or Event API is used without a DynamicClient.
+
+    Subclasses TypeError so callers that already catch TypeError keep working.
+    """
+
+    def __str__(self) -> str:
+        return "client is required. Pass a DynamicClient from get_client() or get_client(fake=True)."
+
+
 class MissingResourceError(Exception):
     def __init__(self, name: str) -> None:
         self.resource_name = name

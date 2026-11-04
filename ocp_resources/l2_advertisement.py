@@ -14,7 +14,6 @@ class L2Advertisement(NamespacedResource):
         self,
         name=None,
         namespace=None,
-        client=None,
         interfaces=None,
         ip_address_pools=None,
         ip_address_pools_selectors=None,
@@ -33,7 +32,6 @@ class L2Advertisement(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             **kwargs,
         )
         self.interfaces = interfaces

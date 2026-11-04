@@ -14,7 +14,6 @@ class SriovNetwork(NamespacedResource):
         name=None,
         namespace=None,
         network_namespace=None,
-        client=None,
         resource_name=None,
         vlan=None,
         ipam=None,
@@ -27,7 +26,6 @@ class SriovNetwork(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

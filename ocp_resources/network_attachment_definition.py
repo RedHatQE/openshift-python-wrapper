@@ -18,7 +18,6 @@ class NetworkAttachmentDefinition(NamespacedResource):
         self,
         name=None,
         namespace=None,
-        client=None,
         cni_type=None,
         cni_version=DEFAULT_CNI_VERSION,
         config=None,
@@ -31,7 +30,6 @@ class NetworkAttachmentDefinition(NamespacedResource):
         Args:
             name (str): Name of the NetworkAttachmentDefinition.
             namespace (str): Namespace of the NetworkAttachmentDefinition
-            client: (DynamicClient): DynamicClient to use.
             cni_type (str): NetworkAttachmentDefinition CNI.
             cni_version (str): NetworkAttachmentDefinition CNI version.
             config (dict): NetworkAttachmentDefinition spec["config"] to use,
@@ -41,7 +39,6 @@ class NetworkAttachmentDefinition(NamespacedResource):
             *args,
             name=name,
             namespace=namespace,
-            client=client,
             **kwargs,
         )
         self.cni_type = cni_type
@@ -74,22 +71,22 @@ class BridgeNetworkAttachmentDefinition(NetworkAttachmentDefinition):
         cni_type,
         cni_version=DEFAULT_CNI_VERSION,
         vlan=None,
-        client=None,
         mtu=None,
         macspoofchk=None,
         teardown=True,
         old_nad_format=False,
         add_resource_name=True,
         dry_run=None,
+        **kwargs,
     ):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             dry_run=dry_run,
             cni_version=cni_version,
             cni_type=cni_type,
+            **kwargs,
         )
         self.old_nad_format = old_nad_format
         self.bridge_name = bridge_name
@@ -125,13 +122,13 @@ class LinuxBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
         cni_type="cnv-bridge",
         cni_version=DEFAULT_CNI_VERSION,
         vlan=None,
-        client=None,
         mtu=None,
         tuning_type=None,
         teardown=True,
         macspoofchk=None,
         add_resource_name=True,
         dry_run=None,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -139,13 +136,13 @@ class LinuxBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
             bridge_name=bridge_name,
             cni_type=cni_type,
             vlan=vlan,
-            client=client,
             mtu=mtu,
             teardown=teardown,
             macspoofchk=macspoofchk,
             add_resource_name=add_resource_name,
             dry_run=dry_run,
             cni_version=cni_version,
+            **kwargs,
         )
         self.tuning_type = tuning_type
 
@@ -170,11 +167,11 @@ class OvsBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
         namespace,
         bridge_name,
         vlan=None,
-        client=None,
         mtu=None,
         teardown=True,
         dry_run=None,
         cni_version=DEFAULT_CNI_VERSION,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -182,11 +179,11 @@ class OvsBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
             bridge_name=bridge_name,
             cni_type="ovs",
             vlan=vlan,
-            client=client,
             mtu=mtu,
             teardown=teardown,
             dry_run=dry_run,
             cni_version=cni_version,
+            **kwargs,
         )
 
     def to_dict(self) -> None:

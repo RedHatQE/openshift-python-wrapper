@@ -14,7 +14,6 @@ class MetalLB(NamespacedResource):
         self,
         name=None,
         namespace=None,
-        client=None,
         log_level="info",
         speaker_config=None,
         speaker_tolerations=None,
@@ -33,7 +32,6 @@ class MetalLB(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             **kwargs,
         )
         self.log_level = log_level

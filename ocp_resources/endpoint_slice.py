@@ -15,7 +15,6 @@ class EndpointSlice(NamespacedResource):
         self,
         name=None,
         namespace=None,
-        client=None,
         address_type=None,
         endpoints=None,
         ports=None,
@@ -39,7 +38,6 @@ class EndpointSlice(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

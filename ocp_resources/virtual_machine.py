@@ -46,7 +46,6 @@ class VirtualMachine(NamespacedResource):
         self,
         name=None,
         namespace=None,
-        client=None,
         body=None,
         teardown=True,
         yaml_file=None,
@@ -56,7 +55,6 @@ class VirtualMachine(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

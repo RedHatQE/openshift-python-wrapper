@@ -64,13 +64,10 @@ def demo_auto_validation():
     """Demonstrate automatic validation during create"""
     print_section(title="Auto-validation During Create")
 
-    # Get a fake client for demo
-    client = FAKE_CLIENT
-
     # Create pod with auto-validation enabled
     print("1. Creating pod with auto-validation enabled...")
     pod = Pod(
-        client=client,
+        client=FAKE_CLIENT,
         name="auto-validated-pod",
         namespace="default",
         containers=[{"name": "nginx", "image": "nginx:latest"}],
@@ -86,7 +83,7 @@ def demo_auto_validation():
     # Try to create invalid pod with auto-validation
     print("\n2. Creating invalid pod with auto-validation...")
     invalid_pod = Pod(
-        client=client,
+        client=FAKE_CLIENT,
         name="invalid-auto-pod",
         namespace="default",
         containers=[{"name": "nginx"}],  # Missing image

@@ -5,6 +5,8 @@ from typing import Any
 from kubernetes.dynamic import DynamicClient
 from simple_logger.logger import get_logger
 
+from ocp_resources.exceptions import MissingClientError
+
 LOGGER = get_logger(name=__name__)
 
 
@@ -42,6 +44,9 @@ class Event:
         Returns
             list: event objects
 
+        Raises:
+            MissingClientError: If client is None.
+
         example: reading all CSV Warning events in namespace "my-namespace", with reason of "AnEventReason"
               for event in Event.get(
                   default_client,
@@ -52,7 +57,7 @@ class Event:
                 print(event.object)
         """
         if client is None:
-            raise TypeError("client is required")
+            raise MissingClientError()
 
         LOGGER.info("Reading events")
         LOGGER.debug(
@@ -61,15 +66,18 @@ class Event:
             f" resource_version={resource_version}, timeout={timeout}"
         )
 
-        event_listener = client.resources.get(api_version=cls.api_version, kind=cls.__name__)
-        yield from event_listener.watch(
-            namespace=namespace,
-            name=name,
-            label_selector=label_selector,
-            field_selector=field_selector,
-            resource_version=resource_version,
-            timeout=timeout,
-        )
+        def _get() -> Generator[Any, None, None]:
+            event_listener = client.resources.get(api_version=cls.api_version, kind=cls.__name__)
+            yield from event_listener.watch(
+                namespace=namespace,
+                name=name,
+                label_selector=label_selector,
+                field_selector=field_selector,
+                resource_version=resource_version,
+                timeout=timeout,
+            )
+
+        return _get()
 
     @staticmethod
     def _parse_timestamp(event: Any) -> datetime | None:
@@ -108,6 +116,10 @@ class Event:
         Returns:
             List of event resource objects, sorted by ``lastTimestamp`` descending (most recent first).
 
+        Raises:
+            MissingClientError: If client is None.
+            ValueError: If ``since_seconds`` is negative.
+
         Example:
             List Warning events from the last 5 minutes in a namespace::
 
@@ -118,7 +130,7 @@ class Event:
                 )
         """
         if client is None:
-            raise TypeError("client is required")
+            raise MissingClientError()
 
         if since_seconds < 0:
             raise ValueError("since_seconds must be >= 0")
@@ -177,12 +189,15 @@ class Event:
             resource_version (str): filter events by their resource's version
             timeout (int): timeout in seconds
 
+        Raises:
+            MissingClientError: If client is None.
+
         example: deleting all the events with a reason of "AnEventReason", from "my-namespace" namespace
             def delete_events_before_test(client):
                 Event.delete_events(client=client, namespace="my-namespace", field_selector="reason=AnEventReason")
         """
         if client is None:
-            raise TypeError("client is required")
+            raise MissingClientError()
 
         LOGGER.info("Deleting events")
         LOGGER.debug(

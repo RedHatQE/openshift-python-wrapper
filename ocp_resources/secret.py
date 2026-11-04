@@ -13,7 +13,6 @@ class Secret(NamespacedResource):
         self,
         name=None,
         namespace=None,
-        client=None,
         accesskeyid=None,
         secretkey=None,
         htpasswd=None,
@@ -28,7 +27,6 @@ class Secret(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

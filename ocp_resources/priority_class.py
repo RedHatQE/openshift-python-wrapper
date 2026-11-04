@@ -12,7 +12,6 @@ class PriorityClass(Resource):
     def __init__(
         self,
         name=None,
-        client=None,
         teardown=True,
         value=None,
         global_default=False,
@@ -24,7 +23,6 @@ class PriorityClass(Resource):
     ):
         super().__init__(
             name=name,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

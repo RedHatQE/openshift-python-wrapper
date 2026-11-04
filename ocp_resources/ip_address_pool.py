@@ -15,7 +15,6 @@ class IPAddressPool(NamespacedResource):
         self,
         name=None,
         namespace=None,
-        client=None,
         addresses=None,
         auto_assign=True,
         avoid_buggy_ips=False,
@@ -33,7 +32,6 @@ class IPAddressPool(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             **kwargs,
         )
         self.addresses = addresses

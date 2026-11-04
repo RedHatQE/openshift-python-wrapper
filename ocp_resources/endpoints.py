@@ -15,7 +15,6 @@ class Endpoints(NamespacedResource):
         self,
         name=None,
         namespace=None,
-        client=None,
         addresses=None,
         ports=None,
         teardown=True,
@@ -37,7 +36,6 @@ class Endpoints(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

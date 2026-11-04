@@ -13,7 +13,6 @@ class OperatorSource(NamespacedResource):
         display_name=None,
         publisher=None,
         secret=None,
-        client=None,
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
@@ -22,7 +21,6 @@ class OperatorSource(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

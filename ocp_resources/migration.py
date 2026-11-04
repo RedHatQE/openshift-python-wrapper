@@ -1,8 +1,6 @@
 from datetime import date
 from typing import Any
 
-from kubernetes.dynamic import DynamicClient
-
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 
@@ -29,7 +27,6 @@ class Migration(NamespacedResource):
         plan_name: str | None = None,
         plan_namespace: str | None = None,
         cut_over: date | None = None,
-        client: DynamicClient | None = None,
         teardown: bool = True,
         yaml_file: str | None = None,
         delete_timeout: int = TIMEOUT_4MINUTES,
@@ -40,7 +37,6 @@ class Migration(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

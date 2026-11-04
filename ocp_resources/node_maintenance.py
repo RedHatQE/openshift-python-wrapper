@@ -12,7 +12,6 @@ class NodeMaintenance(Resource):
     def __init__(
         self,
         name=None,
-        client=None,
         node=None,
         reason="TEST Reason",
         teardown=True,
@@ -22,7 +21,6 @@ class NodeMaintenance(Resource):
     ):
         super().__init__(
             name=name,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

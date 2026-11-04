@@ -34,7 +34,6 @@ class NodeNetworkConfigurationPolicy(Resource):
     def __init__(
         self,
         name=None,
-        client=None,
         capture=None,
         node_selector=None,
         node_selector_labels=None,
@@ -72,7 +71,6 @@ class NodeNetworkConfigurationPolicy(Resource):
         """
         super().__init__(
             name=name,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
