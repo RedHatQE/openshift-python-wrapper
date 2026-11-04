@@ -1,9 +1,13 @@
 from ocp_resources.node_network_configuration_policy import (
     NodeNetworkConfigurationPolicy,
 )
+from ocp_resources.resource import get_client
+
+client = get_client()
 
 # Using capture syntax to switch ipv4 config between interfaces
 my_nncp = NodeNetworkConfigurationPolicy(
+    client=client,
     name="capture_nncp",
     capture={
         "first-nic": 'interfaces.name=="ens8"',
