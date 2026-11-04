@@ -200,7 +200,7 @@ class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
         network_name: str | None = None,
         topology: str | None = None,
         vlan: int | None = None,
-        mtu: str | None = None,
+        mtu: int | None = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -214,7 +214,7 @@ class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
                 resources created in different namespaces to the same network.
             vlan (int, optional): A vlan tag ID that will be assigned to traffic from this
                 additional network.
-            mtu (str, optional): The maximum transmission unit (MTU).
+            mtu (int, optional): The maximum transmission unit (MTU).
             topology (str): The secondary network topology to be created.
         """
         super().__init__(
