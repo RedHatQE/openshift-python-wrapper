@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 from ocp_resources.exceptions import MissingRequiredArgumentError
 from ocp_resources.resource import NamespacedResource
@@ -16,14 +17,13 @@ class NetworkAttachmentDefinition(NamespacedResource):
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
-        cni_type=None,
-        cni_version=DEFAULT_CNI_VERSION,
-        config=None,
-        *args,
-        **kwargs,
-    ):
+        name: str | None = None,
+        namespace: str | None = None,
+        cni_type: str | None = None,
+        cni_version: str = DEFAULT_CNI_VERSION,
+        config: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> None:
         """
         Create and manage NetworkAttachmentDefinition
 
@@ -36,7 +36,6 @@ class NetworkAttachmentDefinition(NamespacedResource):
                 if config is None basic config will be created.
         """
         super().__init__(
-            *args,
             name=name,
             namespace=namespace,
             **kwargs,
@@ -65,20 +64,20 @@ class NetworkAttachmentDefinition(NamespacedResource):
 class BridgeNetworkAttachmentDefinition(NetworkAttachmentDefinition):
     def __init__(
         self,
-        name,
-        namespace,
-        bridge_name,
-        cni_type,
-        cni_version=DEFAULT_CNI_VERSION,
-        vlan=None,
-        mtu=None,
-        macspoofchk=None,
-        teardown=True,
-        old_nad_format=False,
-        add_resource_name=True,
-        dry_run=None,
-        **kwargs,
-    ):
+        name: str,
+        namespace: str,
+        bridge_name: str,
+        cni_type: str,
+        cni_version: str = DEFAULT_CNI_VERSION,
+        vlan: int | None = None,
+        mtu: int | None = None,
+        macspoofchk: bool | None = None,
+        teardown: bool = True,
+        old_nad_format: bool | None = False,
+        add_resource_name: bool = True,
+        dry_run: bool | None = None,
+        **kwargs: Any,
+    ) -> None:
         super().__init__(
             name=name,
             namespace=namespace,
@@ -116,20 +115,20 @@ class BridgeNetworkAttachmentDefinition(NetworkAttachmentDefinition):
 class LinuxBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
     def __init__(
         self,
-        name,
-        namespace,
-        bridge_name,
-        cni_type="cnv-bridge",
-        cni_version=DEFAULT_CNI_VERSION,
-        vlan=None,
-        mtu=None,
-        tuning_type=None,
-        teardown=True,
-        macspoofchk=None,
-        add_resource_name=True,
-        dry_run=None,
-        **kwargs,
-    ):
+        name: str,
+        namespace: str,
+        bridge_name: str,
+        cni_type: str = "cnv-bridge",
+        cni_version: str = DEFAULT_CNI_VERSION,
+        vlan: int | None = None,
+        mtu: int | None = None,
+        tuning_type: str | None = None,
+        teardown: bool = True,
+        macspoofchk: bool | None = None,
+        add_resource_name: bool = True,
+        dry_run: bool | None = None,
+        **kwargs: Any,
+    ) -> None:
         super().__init__(
             name=name,
             namespace=namespace,
@@ -163,16 +162,16 @@ class LinuxBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
 class OvsBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
     def __init__(
         self,
-        name,
-        namespace,
-        bridge_name,
-        vlan=None,
-        mtu=None,
-        teardown=True,
-        dry_run=None,
-        cni_version=DEFAULT_CNI_VERSION,
-        **kwargs,
-    ):
+        name: str,
+        namespace: str,
+        bridge_name: str,
+        vlan: int | None = None,
+        mtu: int | None = None,
+        teardown: bool = True,
+        dry_run: bool | None = None,
+        cni_version: str = DEFAULT_CNI_VERSION,
+        **kwargs: Any,
+    ) -> None:
         super().__init__(
             name=name,
             namespace=namespace,

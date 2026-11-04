@@ -23,7 +23,6 @@ class L2Advertisement(NamespacedResource):
         Args:
             name (str): Name of the MetalLB or it's CR's.
             namespace (str): Namespace of the MetalLB
-            client: (DynamicClient): DynamicClient to use.
             interfaces (list): List of interfaces.
             ip_address_pools (list): The list of IPAddressPools to advertise via this advertisement, selected by name.
             ip_address_pools_selectors (list): A selector for the IPAddressPools which would get advertised

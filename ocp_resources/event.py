@@ -32,7 +32,7 @@ class Event:
         get - retrieves K8s events.
 
         Args:
-            client (DynamicClient): K8s client
+            client (DynamicClient): Mandatory K8s client; obtain it from get_client().
             namespace (str): event namespace
             name (str): event name
             label_selector (str): filter events by labels; comma separated string of key=value
@@ -41,8 +41,8 @@ class Event:
             resource_version (str): filter events by their resource's version
             timeout (int): timeout in seconds
 
-        Returns
-            list: event objects
+        Returns:
+            generator: Yields watched event objects; the client is validated before iteration.
 
         Raises:
             MissingClientError: If client is None.
@@ -107,7 +107,7 @@ class Event:
         this method returns already-existing events immediately.
 
         Args:
-            client: K8s dynamic client.
+            client: Mandatory K8s dynamic client; obtain it from get_client().
             namespace: Filter events to this namespace.
             field_selector: Filter events by fields (e.g. ``"type==Warning"``).
             label_selector: Filter events by labels.
@@ -180,7 +180,7 @@ class Event:
             events in the test, in order to prevent false positive test.
 
         Args:
-            client (DynamicClient): K8s client
+            client (DynamicClient): Mandatory K8s client; obtain it from get_client().
             namespace (str): event namespace
             name (str): event name
             label_selector (str): filter events by labels; comma separated string of key=value

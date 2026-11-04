@@ -11,7 +11,6 @@ class Job(NamespacedResource):
     Args:
         name (str): Job name.
         namespace (str): Namespace name.
-        client (DynamicClient): Dynamic client for connecting to a remote cluster.
         teardown (bool): Indicates if this resource would need to be deleted.
         yaml_file (str): Yaml file for the resource.
         delete_timeout (int): Timeout associated with delete action.

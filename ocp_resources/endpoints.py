@@ -26,7 +26,6 @@ class Endpoints(NamespacedResource):
         Args:
             name (str): Name of the endpoints resource
             namespace (str): Namespace of endpoints resource
-            client: (DynamicClient): DynamicClient for api calls
             addresses (list): List of ip addresses which offers the related ports that are marked as ready
             ports (list): List of port numbers available on the related ip addresses
             teardown (bool): Indicates if the resource should be torn down at the end

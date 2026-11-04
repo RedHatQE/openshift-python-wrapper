@@ -1224,6 +1224,7 @@ class Resource(ResourceConstants):
             singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource.
             raw (bool): If True return raw object.
             exceptions_dict (dict): Exceptions dict for TimeoutSampler
+            **kwargs (Any): Filtering arguments passed to the resource list call.
 
         Returns:
             generator: Generator of Resources of cls.kind.
@@ -1471,9 +1472,6 @@ class Resource(ResourceConstants):
             client (DynamicClient): Mandatory k8s client; obtain it from get_client().
             **kwargs (dict): kwargs to pass to client.get()
 
-        Returns:
-            generator: Generator of cluster resources.
-
         Raises:
             MissingClientError: If client is None.
             TypeError: If removed client kwargs (dyn_client, config_file, config_dict, context)
@@ -1665,8 +1663,9 @@ class NamespacedResource(Resource):
             yaml_file: Yaml file for the resource.
             delete_timeout: Timeout associated with delete action.
             ensure_exists: Whether to check if the resource exists before when initializing the resource, raise if not.
-            **kwargs: Forwarded to `Resource.__init__`; removed client kwargs are rejected there
-                with the name of the instantiated class.
+            **kwargs: Forwarded to `Resource.__init__`, which rejects removed client kwargs
+                (dyn_client, config_file, config_dict, context) and unknown arguments, naming the
+                instantiated class.
 
         Raises:
             TypeError: If removed client kwargs (dyn_client, config_file, config_dict, context)
@@ -1675,8 +1674,6 @@ class NamespacedResource(Resource):
             MissingRequiredArgumentError: If name or namespace is missing when yaml_file and
                 kind_dict are not set.
         """
-        _reject_removed_client_kwargs(kwargs)
-
         super().__init__(
             name=name,
             client=client,
@@ -1710,6 +1707,7 @@ class NamespacedResource(Resource):
             singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource.
             raw (bool): If True return raw object.
             exceptions_dict (dict): Exceptions dict for TimeoutSampler
+            **kwargs (Any): Filtering arguments passed to the resource list call.
 
         Returns:
             generator: Generator of Resources of cls.kind
@@ -2083,7 +2081,7 @@ class ResourceList(BaseResourceList):
         Args:
             resource_class (Type[Resource]): The resource class to instantiate (e.g., Namespace).
             num_resources (int): The number of resource copies to create.
-            client (DynamicClient): The dynamic client to use. Defaults to None.
+            client (DynamicClient): The dynamic client to use; mandatory.
             **kwargs (Any): Arguments to be passed to the constructor of the resource_class.
                               A 'name' key is required in kwargs to serve as the base name for the resources.
         """
