@@ -75,7 +75,7 @@ include = [
 [project]
 requires-python = ">=3.11,<3.15"
 name = "openshift-python-wrapper"
-version = "11.0.150"
+version = "11.0.151"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 readme = "README.md"
 license = "Apache-2.0"
