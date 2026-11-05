@@ -46,7 +46,7 @@ class RouteAdvertisements(Resource):
         self.advertisements = advertisements
         self.frr_configuration_selector = frr_configuration_selector
         self.network_selectors = network_selectors
-        self.node_selector = node_selector
+        self.spec_node_selector = node_selector
         self.target_vrf = target_vrf
 
     def to_dict(self) -> None:
@@ -63,8 +63,8 @@ class RouteAdvertisements(Resource):
             if self.network_selectors is None:
                 raise MissingRequiredArgumentError(argument="self.network_selectors")
 
-            if self.node_selector is None:
-                raise MissingRequiredArgumentError(argument="self.node_selector")
+            if self.spec_node_selector is None:
+                raise MissingRequiredArgumentError(argument="self.spec_node_selector")
 
             self.res["spec"] = {}
             _spec = self.res["spec"]
@@ -72,7 +72,7 @@ class RouteAdvertisements(Resource):
             _spec["advertisements"] = self.advertisements
             _spec["frrConfigurationSelector"] = self.frr_configuration_selector
             _spec["networkSelectors"] = self.network_selectors
-            _spec["nodeSelector"] = self.node_selector
+            _spec["nodeSelector"] = self.spec_node_selector
 
             if self.target_vrf is not None:
                 _spec["targetVRF"] = self.target_vrf

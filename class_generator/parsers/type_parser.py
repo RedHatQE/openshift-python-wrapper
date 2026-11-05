@@ -142,6 +142,11 @@ def format_description(description: str) -> str:
     return _res
 
 
+# Base Resource attributes that are not constructor kwargs. A spec field with one of these names keeps
+# its public arg name, and only the attribute is prefixed so the base value (e.g. api_version) survives.
+RENAME_ATTRIBUTE_FOR: set[str] = {"api_version", "node_selector", "singular_name", "timeout_seconds"}
+
+
 def prepare_property_dict(
     schema: dict[str, Any],
     required: list[str],
@@ -161,6 +166,7 @@ def prepare_property_dict(
         Updated resource dictionary
     """
     keys_to_ignore: list[str] = ["kind", "apiVersion", "status"]
+    # Fields renamed in the public arg name because they collide with a base Resource constructor kwarg
     keys_to_rename: set[str] = {"annotations", "labels"}
     if dict_key != SPEC_STR.lower():
         keys_to_ignore.extend(["metadata", SPEC_STR.lower()])
@@ -173,7 +179,11 @@ def prepare_property_dict(
 
         val_schema = get_property_schema(property_=val)
         type_dict = types_generator(key_dict=val_schema)
-        python_name = convert_camel_case_to_snake_case(name=f"{dict_key}_{key}" if key in keys_to_rename else key)
+        # Match the rename set on the converted name too, so camelCase keys (nodeSelector) are renamed
+        python_key = convert_camel_case_to_snake_case(name=key)
+        python_name = convert_camel_case_to_snake_case(
+            name=f"{dict_key}_{key}" if key in keys_to_rename or python_key in keys_to_rename else key
+        )
 
         # Sanitize Python reserved keywords
         safe_python_name, original_name = sanitize_python_name(name=python_name)
@@ -181,6 +191,9 @@ def prepare_property_dict(
 
         resource_dict[dict_key].append({
             "name-for-class-arg": safe_python_name,
+            "attribute-name": (
+                f"{SPEC_STR.lower()}_{python_name}" if python_name in RENAME_ATTRIBUTE_FOR else safe_python_name
+            ),
             "property-name": key,
             "original-python-name": python_name,  # Store original for reference
             "is-keyword-renamed": is_keyword_renamed,  # Flag for template

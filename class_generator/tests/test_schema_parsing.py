@@ -1,6 +1,7 @@
 """Tests for schema parsing functions."""
 
 from class_generator.core.schema import _clean_description, _parse_oc_explain_output
+from class_generator.parsers.type_parser import prepare_property_dict
 
 
 class TestCleanDescription:
@@ -203,3 +204,46 @@ FIELDS:
         assert "validField" in result["properties"]
         assert "anotherValidField" in result["properties"]
         assert "malformedLine" not in result["properties"]
+
+
+class TestPreparePropertyDictRenames:
+    """Test spec field names that collide with base Resource attributes."""
+
+    def _prepare(self, schema: dict) -> dict[str, dict]:
+        resource_dict: dict = {"spec": [], "fields": []}
+        return prepare_property_dict(
+            schema=schema,
+            required=[],
+            resource_dict=resource_dict,
+            dict_key="spec",
+        )["spec"]
+
+    def test_base_class_attribute_keeps_public_name(self):
+        """api_version is a Resource class attribute: the public arg keeps its name, the attribute is renamed."""
+        [arg] = self._prepare({"api_version": {"type": "string"}})
+
+        assert arg["name-for-class-arg"] == "api_version"
+        assert arg["attribute-name"] == "spec_api_version"
+        assert arg["property-name"] == "api_version"
+
+    def test_node_selector_keeps_public_name(self):
+        """nodeSelector keeps its public arg name, snake_case key and camelCase key alike."""
+        snake, camel = self._prepare({"node_selector": {"type": "string"}, "nodeSelector": {"type": "object"}})
+
+        for arg in (snake, camel):
+            assert arg["name-for-class-arg"] == "node_selector"
+            assert arg["attribute-name"] == "spec_node_selector"
+
+    def test_annotations_public_name_is_renamed(self):
+        """annotations keeps the long-standing public spec_ rename."""
+        [arg] = self._prepare({"annotations": {"type": "object"}})
+
+        assert arg["name-for-class-arg"] == "spec_annotations"
+        assert arg["attribute-name"] == "spec_annotations"
+
+    def test_regular_field_keeps_both_names(self):
+        """Unrelated spec fields keep identical public and attribute names."""
+        [arg] = self._prepare({"auto_upgrade": {"type": "boolean"}})
+
+        assert arg["name-for-class-arg"] == "auto_upgrade"
+        assert arg["attribute-name"] == "auto_upgrade"

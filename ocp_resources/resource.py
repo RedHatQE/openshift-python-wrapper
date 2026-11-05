@@ -494,6 +494,7 @@ class Resource(ResourceConstants):
         APPS: str = "apps"
         APPSTUDIO_REDHAT_COM: str = "appstudio.redhat.com"
         AUTHENTICATION_K8S_IO: str = "authentication.k8s.io"
+        AWX_ANSIBLE_COM: str = "awx.ansible.com"
         BACKUP_KUBEVIRT_IO: str = "backup.kubevirt.io"
         BATCH: str = "batch"
         BITNAMI_COM: str = "bitnami.com"
