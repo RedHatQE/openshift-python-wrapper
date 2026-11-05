@@ -108,11 +108,15 @@ def _import_aliases(tree: ast.AST, resource_names: set[str]) -> tuple[dict[str, 
     class_aliases: dict[str, str] = {}
     module_names: set[str] = {"ocp_resources"}
 
+    known_api_names = resource_names | CLASSMETHOD_ONLY_CLASSES
+
     for node in ast.walk(tree):
         if isinstance(node, ast.ImportFrom) and node.module and node.module.startswith("ocp_resources"):
             for alias in node.names:
-                if alias.name in resource_names and alias.asname:
+                if alias.name in known_api_names and alias.asname:
                     class_aliases[alias.asname] = alias.name
+                elif node.module == "ocp_resources":
+                    module_names.add(alias.asname or alias.name)
 
         elif isinstance(node, ast.Import):
             for alias in node.names:
@@ -210,12 +214,15 @@ def _missing_client_calls(tree: ast.AST, resource_names: set[str]) -> list[str]:
             continue
 
         keywords = {keyword.arg for keyword in node.keywords}
-        if None in keywords:  # **kwargs splat, cannot be checked statically
+        if None in keywords or any(isinstance(arg, ast.Starred) for arg in node.args):
             continue
 
         # Constructors take client as a required keyword; classmethods take it first,
         # because `get`/`list`/`delete_events` declare client as their first parameter.
-        if "client" in keywords or (is_classmethod and node.args):
+        # Classmethods declare client as their first parameter, so any non-literal
+        # positional expression may be a client; literals cannot be DynamicClients.
+        positional_client = is_classmethod and node.args and not isinstance(node.args[0], (ast.Constant, ast.Starred))
+        if "client" in keywords or positional_client:
             continue
 
         missing.append(f"{node.lineno}: {target}(...)")
@@ -248,6 +255,10 @@ def test_examples_construct_resources_with_client() -> None:
         pytest.param('Secret.get(label_selector="a=b")', ["1: Secret.get(...)"], id="classmethod-without-client"),
         pytest.param('Secret.get(client=c, label_selector="a=b")', [], id="classmethod-with-client"),
         pytest.param("Secret.get(c)", [], id="classmethod-positional-client"),
+        pytest.param("Secret.get(client_obj)", [], id="classmethod-client-object"),
+        pytest.param("Secret.get(get_client())", [], id="classmethod-client-factory"),
+        pytest.param('Secret.get("name")', ["1: Secret.get(...)"], id="classmethod-non-client-positional"),
+        pytest.param("Secret.get(*args)", [], id="classmethod-starred-args-is-skipped"),
         pytest.param("Resource.get_all_cluster_resources(c)", [], id="cluster-resources-positional-client"),
         pytest.param("Event.get()", ["1: Event.get(...)"], id="event-api-without-client"),
         pytest.param("Event.list()", ["1: Event.list(...)"], id="event-list-without-client"),
@@ -263,6 +274,11 @@ def test_examples_construct_resources_with_client() -> None:
             "import ocp_resources.role\nocp_resources.role.Role(name='n')", ["2: Role(...)"], id="qualified-import"
         ),
         pytest.param('import ocp_resources.role as r\nr.Role(name="n")', ["2: Role(...)"], id="module-alias-import"),
+        pytest.param("from ocp_resources import role\nrole.Role(name='n')", ["2: Role(...)"], id="from-package-module"),
+        pytest.param(
+            "from ocp_resources import pod as p\np.Pod(name='n')", ["2: Pod(...)"], id="from-package-module-alias"
+        ),
+        pytest.param("from ocp_resources.event import Event as E\nE.get()", ["2: Event.get(...)"], id="event-alias"),
         pytest.param('self.Secret(name="n")', [], id="attribute-named-like-a-resource-is-not-a-constructor"),
         pytest.param('factory.Role(name="n")', [], id="foreign-object-attribute-is-not-a-constructor"),
         pytest.param("Secret(**kwargs)", [], id="kwargs-splat-is-skipped"),
@@ -270,7 +286,12 @@ def test_examples_construct_resources_with_client() -> None:
     ],
 )
 def test_missing_client_detection(source: str, expected: list[str]) -> None:
-    """The detector must flag every client-less resource call and nothing else."""
+    """The detector must flag every client-less resource call and nothing else.
+
+    Args:
+        source: Python source snippet to parse.
+        expected: Expected ``<line>: <API>(...)`` markers, empty when no client is missing.
+    """
     resource_names = {"Secret", "Resource", "Role", "Pod"}
 
     assert _missing_client_calls(tree=ast.parse(source), resource_names=resource_names) == expected
