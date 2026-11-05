@@ -142,6 +142,11 @@ def format_description(description: str) -> str:
     return _res
 
 
+# Base Resource attributes that are not constructor kwargs. A spec field with one of these names keeps
+# its public arg name, and only the attribute is prefixed so the base value (e.g. api_version) survives.
+RENAME_ATTRIBUTE_FOR: set[str] = {"api_version", "singular_name", "timeout_seconds"}
+
+
 def prepare_property_dict(
     schema: dict[str, Any],
     required: list[str],
@@ -161,13 +166,12 @@ def prepare_property_dict(
         Updated resource dictionary
     """
     keys_to_ignore: list[str] = ["kind", "apiVersion", "status"]
-    # Fields renamed to avoid colliding with base Resource attributes (api_version is the resource's own
-    # apiVersion, node_selector is the base class pod-placement kwarg)
+    # Fields renamed in the public arg name because they collide with a base Resource constructor kwarg
     keys_to_rename: set[str] = {"annotations", "labels"}
     if dict_key != SPEC_STR.lower():
         keys_to_ignore.extend(["metadata", SPEC_STR.lower()])
     else:
-        keys_to_rename |= {SPEC_STR.lower(), "api_version", "node_selector"}
+        keys_to_rename |= {SPEC_STR.lower(), "node_selector"}
 
     for key, val in schema.items():
         if key in keys_to_ignore:
@@ -183,6 +187,9 @@ def prepare_property_dict(
 
         resource_dict[dict_key].append({
             "name-for-class-arg": safe_python_name,
+            "attribute-name": (
+                f"{SPEC_STR.lower()}_{python_name}" if python_name in RENAME_ATTRIBUTE_FOR else safe_python_name
+            ),
             "property-name": key,
             "original-python-name": python_name,  # Store original for reference
             "is-keyword-renamed": is_keyword_renamed,  # Flag for template

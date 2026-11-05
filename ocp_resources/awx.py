@@ -22,7 +22,7 @@ class AWX(NamespacedResource):
         affinity: dict[str, Any] | None = None,
         spec_annotations: str | None = None,
         api_urlpattern_prefix: str | None = None,
-        spec_api_version: str | None = None,
+        api_version: str | None = None,
         auto_upgrade: bool | None = None,
         broadcast_websocket_secret: str | None = None,
         bundle_cacert_secret: str | None = None,
@@ -208,7 +208,7 @@ class AWX(NamespacedResource):
 
             api_urlpattern_prefix (str): An optional configuration to add a prefix in the API URL path
 
-            spec_api_version (str): apiVersion of the deployment type
+            api_version (str): apiVersion of the deployment type
 
             auto_upgrade (bool): Should AWX instances be automatically upgraded when operator gets
               upgraded
@@ -567,7 +567,7 @@ class AWX(NamespacedResource):
         self.affinity = affinity
         self.spec_annotations = spec_annotations
         self.api_urlpattern_prefix = api_urlpattern_prefix
-        self.spec_api_version = spec_api_version
+        self.spec_api_version = api_version
         self.auto_upgrade = auto_upgrade
         self.broadcast_websocket_secret = broadcast_websocket_secret
         self.bundle_cacert_secret = bundle_cacert_secret
