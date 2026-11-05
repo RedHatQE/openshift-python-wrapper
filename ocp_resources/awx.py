@@ -89,7 +89,7 @@ class AWX(NamespacedResource):
         nginx_worker_cpu_affinity: str | None = None,
         nginx_worker_processes: int | None = None,
         no_log: bool | None = None,
-        spec_node_selector: str | None = None,
+        node_selector: str | None = None,
         nodeport_port: int | None = None,
         old_postgres_configuration_secret: str | None = None,
         postgres_configuration_secret: str | None = None,
@@ -345,7 +345,7 @@ class AWX(NamespacedResource):
 
             no_log (bool): Configure no_log for no_log tasks
 
-            spec_node_selector (str): nodeSelector for the pods
+            node_selector (str): nodeSelector for the pods
 
             nodeport_port (int): Port to use for the nodeport
 
@@ -634,7 +634,7 @@ class AWX(NamespacedResource):
         self.nginx_worker_cpu_affinity = nginx_worker_cpu_affinity
         self.nginx_worker_processes = nginx_worker_processes
         self.no_log = no_log
-        self.spec_node_selector = spec_node_selector
+        self.spec_node_selector = node_selector
         self.nodeport_port = nodeport_port
         self.old_postgres_configuration_secret = old_postgres_configuration_secret
         self.postgres_configuration_secret = postgres_configuration_secret

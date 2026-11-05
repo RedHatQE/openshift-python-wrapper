@@ -83,7 +83,7 @@ class NMState(Resource):
         self.infra_tolerations = infra_tolerations
         self.log_level = log_level
         self.metrics_configuration = metrics_configuration
-        self.node_selector = node_selector
+        self.spec_node_selector = node_selector
         self.probe_configuration = probe_configuration
         self.self_sign_configuration = self_sign_configuration
         self.tolerations = tolerations
@@ -114,8 +114,8 @@ class NMState(Resource):
             if self.metrics_configuration is not None:
                 _spec["metricsConfiguration"] = self.metrics_configuration
 
-            if self.node_selector is not None:
-                _spec["nodeSelector"] = self.node_selector
+            if self.spec_node_selector is not None:
+                _spec["nodeSelector"] = self.spec_node_selector
 
             if self.probe_configuration is not None:
                 _spec["probeConfiguration"] = self.probe_configuration

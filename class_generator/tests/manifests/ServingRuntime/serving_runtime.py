@@ -88,7 +88,7 @@ class ServingRuntime(NamespacedResource):
         self.image_pull_secrets = image_pull_secrets
         self.spec_labels = spec_labels
         self.multi_model = multi_model
-        self.node_selector = node_selector
+        self.spec_node_selector = node_selector
         self.protocol_versions = protocol_versions
         self.replicas = replicas
         self.storage_helper = storage_helper
@@ -139,8 +139,8 @@ class ServingRuntime(NamespacedResource):
             if self.multi_model is not None:
                 _spec["multiModel"] = self.multi_model
 
-            if self.node_selector is not None:
-                _spec["nodeSelector"] = self.node_selector
+            if self.spec_node_selector is not None:
+                _spec["nodeSelector"] = self.spec_node_selector
 
             if self.protocol_versions is not None:
                 _spec["protocolVersions"] = self.protocol_versions

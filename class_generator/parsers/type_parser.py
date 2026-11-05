@@ -144,7 +144,7 @@ def format_description(description: str) -> str:
 
 # Base Resource attributes that are not constructor kwargs. A spec field with one of these names keeps
 # its public arg name, and only the attribute is prefixed so the base value (e.g. api_version) survives.
-RENAME_ATTRIBUTE_FOR: set[str] = {"api_version", "singular_name", "timeout_seconds"}
+RENAME_ATTRIBUTE_FOR: set[str] = {"api_version", "node_selector", "singular_name", "timeout_seconds"}
 
 
 def prepare_property_dict(
@@ -171,7 +171,7 @@ def prepare_property_dict(
     if dict_key != SPEC_STR.lower():
         keys_to_ignore.extend(["metadata", SPEC_STR.lower()])
     else:
-        keys_to_rename |= {SPEC_STR.lower(), "node_selector"}
+        keys_to_rename |= {SPEC_STR.lower()}
 
     for key, val in schema.items():
         if key in keys_to_ignore:
@@ -179,7 +179,11 @@ def prepare_property_dict(
 
         val_schema = get_property_schema(property_=val)
         type_dict = types_generator(key_dict=val_schema)
-        python_name = convert_camel_case_to_snake_case(name=f"{dict_key}_{key}" if key in keys_to_rename else key)
+        # Match the rename set on the converted name too, so camelCase keys (nodeSelector) are renamed
+        python_key = convert_camel_case_to_snake_case(name=key)
+        python_name = convert_camel_case_to_snake_case(
+            name=f"{dict_key}_{key}" if key in keys_to_rename or python_key in keys_to_rename else key
+        )
 
         # Sanitize Python reserved keywords
         safe_python_name, original_name = sanitize_python_name(name=python_name)

@@ -219,19 +219,27 @@ class TestPreparePropertyDictRenames:
         )["spec"]
 
     def test_base_class_attribute_keeps_public_name(self):
-        """api_version is a Resource class attribute, not a kwarg: only the attribute is renamed."""
+        """api_version is a Resource class attribute: the public arg keeps its name, the attribute is renamed."""
         [arg] = self._prepare({"api_version": {"type": "string"}})
 
         assert arg["name-for-class-arg"] == "api_version"
         assert arg["attribute-name"] == "spec_api_version"
         assert arg["property-name"] == "api_version"
 
-    def test_constructor_kwarg_is_renamed(self):
-        """node_selector is a Resource kwarg: the public name is renamed so it cannot shadow it."""
-        [arg] = self._prepare({"node_selector": {"type": "string"}})
+    def test_node_selector_keeps_public_name(self):
+        """nodeSelector keeps its public arg name, snake_case key and camelCase key alike."""
+        snake, camel = self._prepare({"node_selector": {"type": "string"}, "nodeSelector": {"type": "object"}})
 
-        assert arg["name-for-class-arg"] == "spec_node_selector"
-        assert arg["attribute-name"] == "spec_node_selector"
+        for arg in (snake, camel):
+            assert arg["name-for-class-arg"] == "node_selector"
+            assert arg["attribute-name"] == "spec_node_selector"
+
+    def test_annotations_public_name_is_renamed(self):
+        """annotations keeps the long-standing public spec_ rename."""
+        [arg] = self._prepare({"annotations": {"type": "object"}})
+
+        assert arg["name-for-class-arg"] == "spec_annotations"
+        assert arg["attribute-name"] == "spec_annotations"
 
     def test_regular_field_keeps_both_names(self):
         """Unrelated spec fields keep identical public and attribute names."""

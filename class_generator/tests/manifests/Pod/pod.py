@@ -334,7 +334,7 @@ class Pod(NamespacedResource):
         self.image_pull_secrets = image_pull_secrets
         self.init_containers = init_containers
         self.node_name = node_name
-        self.node_selector = node_selector
+        self.spec_node_selector = node_selector
         self.os = os
         self.overhead = overhead
         self.preemption_policy = preemption_policy
@@ -423,8 +423,8 @@ class Pod(NamespacedResource):
             if self.node_name is not None:
                 _spec["nodeName"] = self.node_name
 
-            if self.node_selector is not None:
-                _spec["nodeSelector"] = self.node_selector
+            if self.spec_node_selector is not None:
+                _spec["nodeSelector"] = self.spec_node_selector
 
             if self.os is not None:
                 _spec["os"] = self.os
