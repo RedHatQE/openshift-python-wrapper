@@ -31,12 +31,12 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # The build runs a third-party generator; leaving the token in .git/config would hand it
           # to that process for the rest of the job.
           persist-credentials: false
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@v10.3.3
       - name: Build site from docs/*.md
         # Pinned, because this job's output is what `deploy` publishes: `@latest` would let a new
         # upstream release change the live site with no commit here. Bump deliberately (and bump
@@ -47,7 +47,7 @@ jobs:
           uvx pi-docsite@4.18.0 --docs-dir docs
           --repo-url https://github.com/RedHatQE/openshift-python-wrapper
           --tagline "Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls"
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: docs
 
@@ -64,4 +64,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
