@@ -71,6 +71,30 @@ the workflow's property, not something a contributor has to prove.
 Links between pages use the built `<slug>.html` form, because that is what the published site
 serves.
 
+### Publishing prerequisites
+
+Pages must be configured for **Actions** (one-time repository setting, not per-PR) — this repo is:
+
+```bash
+gh api repos/RedHatQE/openshift-python-wrapper/pages --jq '{build_type, status}'
+# {"build_type":"workflow","status":"built"}
+```
+
+With `build_type: legacy` the site is served straight from the committed `docs/` on `main`, and
+removing that output would take the site down. With `build_type: workflow` the deployed artifact is
+the only thing Pages serves, and Pages keeps serving the **last successful deployment** until the
+next one replaces it — so a merge that stops tracking the output never leaves a missing page; the
+push that merge produces builds and deploys the replacement. Check the live site, not the artifact:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' https://redhatqe.github.io/openshift-python-wrapper/quickstart.html
+```
+
+The first deploy after switching to `build_type: workflow` needs no manual run here: the workflow
+does not exist on `main` until the change merges, and that merge push (`docs/**` in the path filter)
+is what triggers the build and deploy. `gh workflow run docs.yml` (`workflow_dispatch`) is only for a
+re-deploy with no new commit.
+
 Adding a page: create `docs/<slug>.md` and add `<slug>` to `docs/nav.json`. A `.md`
 missing from `nav.json` is still built, placed under a fallback group, and reported.
 
