@@ -75,7 +75,7 @@ Code between markers is auto-generated — do NOT modify manually. Use `class-ge
 
 - ✅ Always: use `uv` for Python ops, run `prek install` before first commit, add typing
 - ⚠️ Ask first: adding new dependencies, modifying base `Resource` class, changing CI
-- 🚫 Never: use `python`/`pip` directly, edit generated code between markers, edit generated files in `docs/` (regenerate with pi-docsite instead)
+- 🚫 Never: use `python`/`pip` directly, edit generated code between markers, commit generated files under `docs/` (never run pi-docsite in a PR — edit the `.md` and let the Action build it)
 
 ## Environment
 

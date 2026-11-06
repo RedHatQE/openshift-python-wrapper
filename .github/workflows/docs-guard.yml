@@ -1,0 +1,78 @@
+name: Docs Guard
+
+on: pull_request
+
+permissions:
+  contents: read
+
+jobs:
+  no-generated-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Reject generated docs in the PR
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          set -euo pipefail
+
+          # An absent base ref must fail loudly: falling through to a diff that errors, or to an
+          # empty diff, would report the guard as passing without having checked anything.
+          if [ -z "$BASE_REF" ]; then
+            echo "::error::BASE_REF is empty — cannot compute the PR diff."
+            exit 1
+          fi
+          if ! git rev-parse --verify --quiet "origin/${BASE_REF}" > /dev/null; then
+            echo "::error::origin/${BASE_REF} is not a known ref (shallow clone or absent base)."
+            exit 1
+          fi
+
+          # The diff is captured to a file first so its exit status is checked on its own: piping
+          # git into grep without pipefail reports "no match" when the diff never ran, so an absent
+          # check would look exactly like a passing one.
+          diff_file="$(mktemp)"
+          trap 'rm -f "$diff_file"' EXIT
+          if ! git diff --name-status -z --diff-filter=AMR -M "origin/${BASE_REF}...HEAD" > "$diff_file"; then
+            echo "::error::git diff against origin/${BASE_REF} failed — refusing to report a pass."
+            exit 1
+          fi
+
+          # Only added/modified/renamed/copied files are a violation. A DELETION is the migration
+          # itself (removing the committed output) and must pass, or the PR that fixes the rule can
+          # never satisfy it. Renames are checked on BOTH sides, so docs/foo.md -> docs/index.html
+          # is caught too.
+          #
+          # -z keeps git from quoting or escaping paths (that is core.quotePath, unrelated to the
+          # shell): quoted, an added docs/résumé.html arrives as "docs/r\303\251sum\303\251.html"
+          # and matches none of the patterns below — the guard would pass exactly the files it
+          # exists to reject.
+          #
+          # -z emits `status\0path\0` (`R100\0old\0new\0` for a rename), so status tokens are
+          # dropped by shape, not by column — there is no column left after NUL splitting. Fields
+          # are matched as they arrive and never re-joined with newlines: a path CAN itself contain
+          # a newline, and converting NUL -> newline splits `docs/evil\nx.html` into two lines that
+          # match none of the patterns, so the generated file would slip through. `read -d ''` fails
+          # at EOF, which only ends this while condition (set -e does not apply to a loop
+          # condition), so the last field is not dropped.
+          #
+          # Inverted allowlist: docs/**/*.md and docs/nav.json are the sources; everything else
+          # under docs/ is what .github/workflows/docs.yml builds.
+          offenders=()
+          while IFS= read -r -d '' field; do
+            [[ "$field" =~ ^[ACDMRTUXB][0-9]*$ ]] && continue
+            [[ "$field" == docs/* ]] || continue
+            [[ "$field" == docs/nav.json ]] && continue
+            [[ "$field" =~ ^docs/(.*/)?[^/]+\.md$ ]] && continue
+            offenders+=("$field")
+          done < "$diff_file"
+
+          if [ "${#offenders[@]}" -gt 0 ]; then
+            echo "::error::Generated docs must not be committed — the site is built on main from the docs sources."
+            printf '%s\n' "${offenders[@]}"
+            echo "Everything under docs/ other than docs/**/*.md and docs/nav.json is build output of"
+            echo ".github/workflows/docs.yml — edit the markdown source instead."
+            exit 1
+          fi
+          echo "No generated docs in the diff."
