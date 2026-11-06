@@ -15,7 +15,6 @@ class Restore(NamespacedResource):
         namespace=None,
         included_namespaces=None,
         backup_name=None,
-        client=None,
         teardown=False,
         yaml_file=None,
         **kwargs,
@@ -23,7 +22,6 @@ class Restore(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             **kwargs,

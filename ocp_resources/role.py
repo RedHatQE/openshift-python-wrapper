@@ -16,7 +16,6 @@ class Role(NamespacedResource):
         self,
         name=None,
         namespace=None,
-        client=None,
         rules=None,
         teardown=True,
         yaml_file=None,
@@ -27,7 +26,6 @@ class Role(NamespacedResource):
         Args:
             name (str): ClusterRole name.
             namespace (str): Namespace name.
-            client (DynamicClient): DynamicClient to use.
             rules (list): list of dicts of rules. In the dict:
                 permissions_to_resources (list): List of string with resource/s to which you want to add permissions to.
                 Verbs (list): Determine the action/s (permissions) applicable on a specific resource.
@@ -37,7 +35,6 @@ class Role(NamespacedResource):
             delete_timeout (int, default: 4 minutes): timeout associated with delete action.
         """
         super().__init__(
-            client=client,
             namespace=namespace,
             name=name,
             teardown=teardown,

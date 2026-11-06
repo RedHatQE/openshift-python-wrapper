@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 from ocp_resources.exceptions import MissingRequiredArgumentError
 from ocp_resources.resource import NamespacedResource
@@ -16,32 +17,27 @@ class NetworkAttachmentDefinition(NamespacedResource):
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
-        client=None,
-        cni_type=None,
-        cni_version=DEFAULT_CNI_VERSION,
-        config=None,
-        *args,
-        **kwargs,
-    ):
+        name: str | None = None,
+        namespace: str | None = None,
+        cni_type: str | None = None,
+        cni_version: str = DEFAULT_CNI_VERSION,
+        config: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> None:
         """
         Create and manage NetworkAttachmentDefinition
 
         Args:
             name (str): Name of the NetworkAttachmentDefinition.
             namespace (str): Namespace of the NetworkAttachmentDefinition
-            client: (DynamicClient): DynamicClient to use.
             cni_type (str): NetworkAttachmentDefinition CNI.
             cni_version (str): NetworkAttachmentDefinition CNI version.
             config (dict): NetworkAttachmentDefinition spec["config"] to use,
                 if config is None basic config will be created.
         """
         super().__init__(
-            *args,
             name=name,
             namespace=namespace,
-            client=client,
             **kwargs,
         )
         self.cni_type = cni_type
@@ -68,28 +64,28 @@ class NetworkAttachmentDefinition(NamespacedResource):
 class BridgeNetworkAttachmentDefinition(NetworkAttachmentDefinition):
     def __init__(
         self,
-        name,
-        namespace,
-        bridge_name,
-        cni_type,
-        cni_version=DEFAULT_CNI_VERSION,
-        vlan=None,
-        client=None,
-        mtu=None,
-        macspoofchk=None,
-        teardown=True,
-        old_nad_format=False,
-        add_resource_name=True,
-        dry_run=None,
-    ):
+        name: str,
+        namespace: str,
+        bridge_name: str,
+        cni_type: str,
+        cni_version: str = DEFAULT_CNI_VERSION,
+        vlan: int | None = None,
+        mtu: int | None = None,
+        macspoofchk: bool | None = None,
+        teardown: bool = True,
+        old_nad_format: bool = False,
+        add_resource_name: bool = True,
+        dry_run: bool | None = None,
+        **kwargs: Any,
+    ) -> None:
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             dry_run=dry_run,
             cni_version=cni_version,
             cni_type=cni_type,
+            **kwargs,
         )
         self.old_nad_format = old_nad_format
         self.bridge_name = bridge_name
@@ -119,33 +115,33 @@ class BridgeNetworkAttachmentDefinition(NetworkAttachmentDefinition):
 class LinuxBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
     def __init__(
         self,
-        name,
-        namespace,
-        bridge_name,
-        cni_type="cnv-bridge",
-        cni_version=DEFAULT_CNI_VERSION,
-        vlan=None,
-        client=None,
-        mtu=None,
-        tuning_type=None,
-        teardown=True,
-        macspoofchk=None,
-        add_resource_name=True,
-        dry_run=None,
-    ):
+        name: str,
+        namespace: str,
+        bridge_name: str,
+        cni_type: str = "cnv-bridge",
+        cni_version: str = DEFAULT_CNI_VERSION,
+        vlan: int | None = None,
+        mtu: int | None = None,
+        tuning_type: str | None = None,
+        teardown: bool = True,
+        macspoofchk: bool | None = None,
+        add_resource_name: bool = True,
+        dry_run: bool | None = None,
+        **kwargs: Any,
+    ) -> None:
         super().__init__(
             name=name,
             namespace=namespace,
             bridge_name=bridge_name,
             cni_type=cni_type,
             vlan=vlan,
-            client=client,
             mtu=mtu,
             teardown=teardown,
             macspoofchk=macspoofchk,
             add_resource_name=add_resource_name,
             dry_run=dry_run,
             cni_version=cni_version,
+            **kwargs,
         )
         self.tuning_type = tuning_type
 
@@ -166,27 +162,27 @@ class LinuxBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
 class OvsBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
     def __init__(
         self,
-        name,
-        namespace,
-        bridge_name,
-        vlan=None,
-        client=None,
-        mtu=None,
-        teardown=True,
-        dry_run=None,
-        cni_version=DEFAULT_CNI_VERSION,
-    ):
+        name: str,
+        namespace: str,
+        bridge_name: str,
+        vlan: int | None = None,
+        mtu: int | None = None,
+        teardown: bool = True,
+        dry_run: bool | None = None,
+        cni_version: str = DEFAULT_CNI_VERSION,
+        **kwargs: Any,
+    ) -> None:
         super().__init__(
             name=name,
             namespace=namespace,
             bridge_name=bridge_name,
             cni_type="ovs",
             vlan=vlan,
-            client=client,
             mtu=mtu,
             teardown=teardown,
             dry_run=dry_run,
             cni_version=cni_version,
+            **kwargs,
         )
 
     def to_dict(self) -> None:
@@ -201,12 +197,12 @@ class OvsBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
 class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
     def __init__(
         self,
-        network_name=None,
-        topology=None,
-        vlan=None,
-        mtu=None,
-        **kwargs,
-    ):
+        network_name: str | None = None,
+        topology: str | None = None,
+        vlan: int | None = None,
+        mtu: int | None = None,
+        **kwargs: Any,
+    ) -> None:
         """
         Create and manage an OVN k8s overlay NetworkAttachmentDefinition (a switched, layer 2, topology network).
 
@@ -218,7 +214,7 @@ class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
                 resources created in different namespaces to the same network.
             vlan (int, optional): A vlan tag ID that will be assigned to traffic from this
                 additional network.
-            mtu (str, optional): The maximum transmission unit (MTU).
+            mtu (int, optional): The maximum transmission unit (MTU).
             topology (str): The secondary network topology to be created.
         """
         super().__init__(

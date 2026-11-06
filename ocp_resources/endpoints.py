@@ -15,7 +15,6 @@ class Endpoints(NamespacedResource):
         self,
         name=None,
         namespace=None,
-        client=None,
         addresses=None,
         ports=None,
         teardown=True,
@@ -27,7 +26,6 @@ class Endpoints(NamespacedResource):
         Args:
             name (str): Name of the endpoints resource
             namespace (str): Namespace of endpoints resource
-            client: (DynamicClient): DynamicClient for api calls
             addresses (list): List of ip addresses which offers the related ports that are marked as ready
             ports (list): List of port numbers available on the related ip addresses
             teardown (bool): Indicates if the resource should be torn down at the end
@@ -37,7 +35,6 @@ class Endpoints(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

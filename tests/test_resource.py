@@ -5,7 +5,9 @@ import kubernetes
 import pytest
 import yaml
 
-from ocp_resources.exceptions import ResourceTeardownError
+from fake_kubernetes_client.dynamic_client import FakeDynamicClient
+from ocp_resources.event import Event
+from ocp_resources.exceptions import MissingClientError, ResourceTeardownError
 from ocp_resources.namespace import Namespace
 from ocp_resources.pod import Pod
 from ocp_resources.resource import NamespacedResourceList, Resource, ResourceList
@@ -95,6 +97,98 @@ class TestResource:
         for _resources in Resource.get_all_cluster_resources(client=fake_client):
             if _resources:
                 break
+
+    def test_client_is_required(self, fake_client: FakeDynamicClient) -> None:
+        # All client guards are eager: they raise at call time, before any iteration.
+        with pytest.raises(TypeError, match="client"):
+            Pod(name=BASE_POD_NAME, namespace="default", containers=POD_CONTAINERS)
+
+        with pytest.raises(MissingClientError, match="client is required"):
+            Pod(client=None, name=BASE_POD_NAME, namespace="default", containers=POD_CONTAINERS)  # type: ignore[arg-type]
+
+        with pytest.raises(TypeError, match="client"):
+            Namespace.get()
+
+        with pytest.raises(MissingClientError, match="client is required"):
+            Namespace.get(client=None)  # type: ignore[arg-type]
+
+        with pytest.raises(TypeError, match="client"):
+            Resource.get_all_cluster_resources()
+
+        # get_all_cluster_resources validates eagerly even though it returns a generator
+        with pytest.raises(MissingClientError, match="client is required"):
+            Resource.get_all_cluster_resources(client=None)  # type: ignore[arg-type]
+
+        # NamespacedResource.get is a separate override with its own client guard
+        with pytest.raises(TypeError, match="client"):
+            Pod.get()
+
+        with pytest.raises(MissingClientError, match="client is required"):
+            Pod.get(client=None)  # type: ignore[arg-type]
+
+        # Valid construction still works with an explicit client
+        pod = Pod(client=fake_client, name=BASE_POD_NAME, namespace="default", containers=POD_CONTAINERS)
+        assert pod.client is fake_client
+
+    def test_missing_client_error_is_type_error_subclass(self) -> None:
+        """Callers do `except TypeError`, so the exception must stay a TypeError subclass."""
+        assert issubclass(MissingClientError, TypeError)
+
+    def test_removed_client_kwargs_rejected(self, fake_client: FakeDynamicClient) -> None:
+        with pytest.raises(TypeError, match="Unsupported argument"):
+            Namespace.get(client=fake_client, dyn_client=fake_client)
+
+        with pytest.raises(TypeError, match="Unsupported argument"):
+            # value is an arbitrary placeholder; the kwarg name triggers rejection
+            Namespace.get(client=fake_client, config_file="kubeconfig")
+
+        with pytest.raises(TypeError, match="Unsupported argument"):
+            Resource.get_all_cluster_resources(client=fake_client, context="default")
+
+        with pytest.raises(TypeError, match="Unsupported argument"):
+            Resource.get_all_cluster_resources(client=fake_client, config_dict={})
+
+        # Namespace.get uses * in its signature; Python rejects extra positional args
+        with pytest.raises(TypeError, match="positional"):
+            Namespace.get(fake_client, fake_client)
+
+        # get_all_cluster_resources takes client as its only positional argument
+        with pytest.raises(TypeError, match="positional"):
+            Resource.get_all_cluster_resources(fake_client, "extra")
+
+        # Constructors reject removed client kwargs with the migration hint
+        with pytest.raises(TypeError, match="Unsupported argument"):
+            Pod(
+                client=fake_client,
+                name=BASE_POD_NAME,
+                namespace="default",
+                containers=POD_CONTAINERS,
+                dyn_client=fake_client,
+            )
+
+        # Unknown kwargs are rejected by name, naming the instantiated class
+        with pytest.raises(TypeError, match="Pod.*unexpected keyword argument"):
+            Pod(client=fake_client, name=BASE_POD_NAME, namespace="default", bogus_kwarg=True)
+
+    def test_event_client_is_required(self) -> None:
+        with pytest.raises(TypeError, match="client"):
+            Event.get()
+
+        # Event.get returns a generator but validates the client eagerly
+        with pytest.raises(MissingClientError, match="client is required"):
+            Event.get(client=None)  # type: ignore[arg-type]
+
+        with pytest.raises(TypeError, match="client"):
+            Event.list()
+
+        with pytest.raises(MissingClientError, match="client is required"):
+            Event.list(client=None)  # type: ignore[arg-type]
+
+        with pytest.raises(TypeError, match="client"):
+            Event.delete_events()
+
+        with pytest.raises(MissingClientError, match="client is required"):
+            Event.delete_events(client=None)  # type: ignore[arg-type]
 
     def test_get_condition_message(self, pod):
         assert pod.get_condition_message(

@@ -14,7 +14,6 @@ class ImageStream(NamespacedResource):
         self,
         name=None,
         namespace=None,
-        client=None,
         lookup_policy=False,
         tags=None,
         teardown=True,
@@ -25,7 +24,6 @@ class ImageStream(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

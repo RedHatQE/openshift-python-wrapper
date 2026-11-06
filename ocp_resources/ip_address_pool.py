@@ -15,7 +15,6 @@ class IPAddressPool(NamespacedResource):
         self,
         name=None,
         namespace=None,
-        client=None,
         addresses=None,
         auto_assign=True,
         avoid_buggy_ips=False,
@@ -25,7 +24,6 @@ class IPAddressPool(NamespacedResource):
         Args:
             name (str): Name of the MetalLB or it's CR's.
             namespace (str): Namespace of the MetalLB
-            client: (DynamicClient): DynamicClient to use.
             addresses (list): List of IP addresses.
             auto_assign (bool): IP address assignment. (default: True)
             avoid_buggy_ips (bool): Avoid buggy IP address (default: False)
@@ -33,7 +31,6 @@ class IPAddressPool(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             **kwargs,
         )
         self.addresses = addresses
