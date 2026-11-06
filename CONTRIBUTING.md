@@ -52,11 +52,14 @@ path under `docs/` other than `**/*.md` and `nav.json` (deletions are allowed).
 To build locally for debugging — the output is gitignored, so it never shows up in `git status`:
 
 ```bash
-uvx pi-docsite --docs-dir docs \
+uvx pi-docsite@4.18.0 --docs-dir docs \
   --project-name openshift-python-wrapper \
   --repo-url https://github.com/RedHatQE/openshift-python-wrapper \
   --tagline "Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls"
 ```
+
+The version is pinned to the one `.github/workflows/docs.yml` publishes with, so a local build
+matches the site; bump both together after reviewing a release.
 
 `--repo-url` matters: pi-docsite otherwise derives it from the local `origin`, so building from a
 fork rewrites every repository link. The tagline is the description shown in the sidebar and in

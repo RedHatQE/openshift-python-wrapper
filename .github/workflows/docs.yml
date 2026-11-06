@@ -5,8 +5,10 @@ on:
     branches: [main]
     paths:
       # Any docs change, not just .md: the migration that removes the committed output touches
-      # only generated paths, and it must still deploy.
+      # only generated paths, and it must still deploy. The workflow file is listed because it
+      # carries the tagline, so editing it changes the built site.
       - "docs/**"
+      - ".github/workflows/docs.yml"
   # The first deploy after Pages is switched to build_type=workflow has no push to ride on.
   workflow_dispatch:
 
@@ -30,15 +32,19 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The build runs a third-party generator; leaving the token in .git/config would hand it
+          # to that process for the rest of the job.
+          persist-credentials: false
       - uses: astral-sh/setup-uv@v6
       - name: Build site from docs/*.md
-        # Always the newest release: docs should not wait on a bump commit, and this job holds no
-        # publish rights (they are on `deploy`), so the blast radius of a bad upstream upload is a
-        # failed build, not a compromised deployment.
+        # Pinned, because this job's output is what `deploy` publishes: `@latest` would let a new
+        # upstream release change the live site with no commit here. Bump deliberately (and bump
+        # CONTRIBUTING.md's command with it) after reviewing the release.
         # --repo-url is explicit on purpose: pi-docsite otherwise derives it from `origin`, and a
         # build from a fork rewrites every repository link.
         run: >-
-          uvx pi-docsite@latest --docs-dir docs
+          uvx pi-docsite@4.18.0 --docs-dir docs
           --repo-url https://github.com/RedHatQE/openshift-python-wrapper
           --tagline "Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls"
       - uses: actions/upload-pages-artifact@v3
