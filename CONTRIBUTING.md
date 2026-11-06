@@ -84,10 +84,15 @@ With `build_type: legacy` the site is served straight from the committed `docs/`
 removing that output would take the site down. With `build_type: workflow` the deployed artifact is
 the only thing Pages serves, and Pages keeps serving the **last successful deployment** until the
 next one replaces it — so a merge that stops tracking the output never leaves a missing page; the
-push that merge produces builds and deploys the replacement. Check the live site, not the artifact:
+push that merge produces builds and deploys the replacement. Check the live site, not the artifact —
+but a status code proves only that *something* is live, not that it is **current**: when a deploy
+fails, Pages keeps serving the last successful one, so a `200` can describe the previous page. Build
+locally from the merged commit (command above) and compare the served page with it:
 
 ```bash
-curl -s -o /dev/null -w '%{http_code}\n' https://redhatqe.github.io/openshift-python-wrapper/quickstart.html
+curl -s -o /tmp/live-quickstart.html https://redhatqe.github.io/openshift-python-wrapper/quickstart.html
+cmp docs/quickstart.html /tmp/live-quickstart.html && echo "live quickstart.html matches this commit"
+gh run list --branch main --workflow docs.yml --limit 1   # the run this check belongs to
 ```
 
 The first deploy after switching to `build_type: workflow` needs no manual run here: the workflow
