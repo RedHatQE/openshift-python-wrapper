@@ -63,11 +63,12 @@ class TestMigration:
         assert resource_dict["spec"]["resumeConversion"] is True
         deployed_resource.clean_up(wait=False)
 
-    def test_07_migration_with_positional_client(self, fake_client: FakeDynamicClient) -> None:
+    def test_07_migration_positional_args_with_keyword_client(self, fake_client: FakeDynamicClient) -> None:
         """Keep the documented positional constructor arguments.
 
         `name`, `namespace`, `plan_name`, `plan_namespace` and `cut_over` stay positional;
-        `client` is a required keyword-only argument.
+        `client` is passed by keyword (it reaches `NamespacedResource` through `**kwargs`,
+        so nothing enforces that at the type level - only the run-time check does).
 
         Args:
             fake_client (FakeDynamicClient): Fake Kubernetes client supplied by the fixture.

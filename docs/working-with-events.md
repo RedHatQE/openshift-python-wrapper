@@ -314,7 +314,7 @@ for event in pod.events(
     print(event.object.message)
 ```
 
-> **Warning:** The `dyn_client` parameter on `Event.get()` and `Event.delete_events()` is deprecated and will be removed in the next major release. Use `client` instead.
+> **Note:** `client` is a required argument on all `Event` APIs (`Event.get()`, `Event.list()`, `Event.delete_events()`). The old `dyn_client` parameter has been removed and now raises `TypeError` - pass `client=get_client()` instead. A `client=None` call raises `MissingClientError`, and `Event.get()` validates the client before returning its generator, so a bad call fails immediately.
 
 ## Related Pages
 

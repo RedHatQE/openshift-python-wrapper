@@ -16,7 +16,7 @@ Temporarily modify Kubernetes and OpenShift resources during tests and have thei
 from ocp_resources.resource import ResourceEditor
 from ocp_resources.node import Node
 
-node = Node(name="worker-0")
+node = Node(client=client, name="worker-0")
 
 with ResourceEditor(patches={node: {"metadata": {"labels": {"test-label": "true"}}}}):
     # The node now has the label "test-label": "true"
@@ -36,7 +36,7 @@ That's it—when the `with` block ends (even if an exception occurs), the origin
 from ocp_resources.resource import ResourceEditor
 from ocp_resources.config_map import ConfigMap
 
-cm = ConfigMap(name="my-config", namespace="my-namespace")
+cm = ConfigMap(client=client, name="my-config", namespace="my-namespace")
 ```
 
 ### 2. Define your patch
@@ -69,8 +69,8 @@ from ocp_resources.resource import ResourceEditor
 from ocp_resources.namespace import Namespace
 from ocp_resources.config_map import ConfigMap
 
-ns = Namespace(name="test-ns")
-cm = ConfigMap(name="app-config", namespace="test-ns")
+ns = Namespace(client=client, name="test-ns")
+cm = ConfigMap(client=client, name="app-config", namespace="test-ns")
 
 patches = {
     ns: {"metadata": {"labels": {"env": "test"}}},
@@ -91,7 +91,7 @@ If you need finer control over when patches are applied and reverted—for examp
 from ocp_resources.resource import ResourceEditor
 from ocp_resources.config_map import ConfigMap
 
-cm = ConfigMap(name="app-config", namespace="default")
+cm = ConfigMap(client=client, name="app-config", namespace="default")
 
 editor = ResourceEditor(patches={cm: {"data": {"mode": "maintenance"}}})
 

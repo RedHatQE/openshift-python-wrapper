@@ -315,7 +315,7 @@ All resource classes accept these common parameters:
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `client` | `DynamicClient` | `None` | Cluster client connection (will be required in next major release) |
+| `client` | `DynamicClient` | **required** | Cluster client connection; keyword-only. Obtain it from `get_client()` |
 | `name` | `str` | `None` | Resource name |
 | `namespace` | `str` | `None` | Namespace (namespaced resources only) |
 | `teardown` | `bool` | `True` | Whether `clean_up()` deletes the resource |

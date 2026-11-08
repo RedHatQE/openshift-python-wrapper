@@ -4,12 +4,14 @@
 catch this class of break anyway: the wrappers accept `client` through `**kwargs`, so
 `Role(name=..., rules=...)` type-checks clean and fails only at runtime. That is how
 `examples/role.py` and `examples/node_network_configuration_policy.py` were broken by the
-mandatory-client change while every check stayed green.
+mandatory-client change while every check stayed green. User-facing docs drift the same
+way - nothing executes them - so `docs/*.md` snippets are checked too.
 
-This test therefore checks the examples statically: every construction of a
-Resource/NamespacedResource subclass - and every `get`/`list`/`get_all_cluster_resources`/
-`delete_events` call on one, plus the `Event` APIs - must receive a client, either as the
-`client=` keyword or as the first positional argument of a classmethod.
+This test therefore checks the examples and the documentation statically: every
+construction of a Resource/NamespacedResource subclass - and every `get`/`list`/
+`get_all_cluster_resources`/`delete_events` call on one, plus the `Event` APIs - must
+receive a client, either as the `client=` keyword or as the first positional argument of
+a classmethod.
 """
 
 from __future__ import annotations
@@ -18,6 +20,8 @@ import ast
 import importlib
 import inspect
 import pkgutil
+import re
+import textwrap
 from pathlib import Path
 
 import pytest
@@ -27,6 +31,16 @@ from ocp_resources.event import Event
 from ocp_resources.resource import Resource
 
 EXAMPLES_DIR = Path(__file__).parent.parent / "examples"
+DOCS_DIR = Path(__file__).parent.parent / "docs"
+
+# Fenced blocks that contain Python. Everything else in the docs is bash, yaml, or json.
+PYTHON_FENCE = re.compile(r"^\s*```(?:python|py)\s*$")
+FENCE_END = re.compile(r"^\s*```\s*$")
+
+# Docs keep API-signature blocks (`def get(cls, client: DynamicClient, *, ...) -> Generator`)
+# next to runnable snippets. Signatures have no body, so they never parse - they are
+# skipped, and this floor fails the test if that skip ever swallows the real snippets.
+MIN_PARSED_DOCS_BLOCKS = 380
 
 # Classmethod APIs that take a client as their first positional argument.
 CLASSMETHOD_APIS = frozenset({"delete_events", "get", "get_all_cluster_resources", "list"})
@@ -190,12 +204,14 @@ def _call_target(
     return "", False
 
 
-def _missing_client_calls(tree: ast.AST, resource_names: set[str]) -> list[str]:
+def _missing_client_calls(tree: ast.AST, resource_names: set[str], line_offset: int = 0) -> list[str]:
     """Find resource calls that do not receive a client.
 
     Args:
         tree: Parsed module.
         resource_names: Known resource class names.
+        line_offset: Value added to each reported line number, so callers that parse a
+            fragment (a docs snippet, for example) can report the line in the host file.
 
     Returns:
         list[str]: One ``"<line>: <API>(...)"`` marker per offending call.
@@ -225,9 +241,42 @@ def _missing_client_calls(tree: ast.AST, resource_names: set[str]) -> list[str]:
         if "client" in keywords or positional_client:
             continue
 
-        missing.append(f"{node.lineno}: {target}(...)")
+        missing.append(f"{node.lineno + line_offset}: {target}(...)")
 
     return missing
+
+
+def _markdown_python_blocks(path: Path) -> list[tuple[int, str]]:
+    """Extract the fenced Python blocks of a Markdown file.
+
+    Args:
+        path: Markdown file to read.
+
+    Returns:
+        list[tuple[int, str]]: One ``(first_code_line, code)`` pair per block, where
+            ``first_code_line`` is the 1-based line of ``code``'s first line in ``path``
+            so reported line numbers point at the Markdown file. Fences are dedented so
+            snippets nested in list items still parse.
+    """
+    blocks: list[tuple[int, str]] = []
+    lines = path.read_text(encoding="utf-8").splitlines()
+    index = 0
+
+    while index < len(lines):
+        if not PYTHON_FENCE.match(lines[index]):
+            index += 1
+            continue
+
+        start = index + 1
+        end = start
+
+        while end < len(lines) and not FENCE_END.match(lines[end]):
+            end += 1
+
+        blocks.append((start + 1, textwrap.dedent("\n".join(lines[start:end]))))
+        index = end + 1
+
+    return blocks
 
 
 def test_examples_construct_resources_with_client() -> None:
@@ -245,6 +294,66 @@ def test_examples_construct_resources_with_client() -> None:
             offenders.append(f"{path.relative_to(EXAMPLES_DIR.parent)}:{marker}")
 
     assert not offenders, "resource calls without a client in examples:\n" + "\n".join(offenders)
+
+
+def test_docs_snippets_construct_resources_with_client() -> None:
+    """Every resource call in a docs snippet must receive an explicit client."""
+    resource_names = _resource_class_names()
+    doc_paths = sorted(DOCS_DIR.glob("*.md"))
+    assert doc_paths, f"no docs found under {DOCS_DIR}"
+
+    offenders: list[str] = []
+    skipped = 0
+    parsed = 0
+
+    for path in doc_paths:
+        for first_line, code in _markdown_python_blocks(path=path):
+            try:
+                tree = ast.parse(code)
+            except SyntaxError:
+                # Signature-only illustrations have no body and never parse.
+                skipped += 1
+                continue
+
+            parsed += 1
+
+            for marker in _missing_client_calls(tree=tree, resource_names=resource_names, line_offset=first_line - 1):
+                offenders.append(f"{path.relative_to(DOCS_DIR.parent)}:{marker}")
+
+    assert parsed > MIN_PARSED_DOCS_BLOCKS, (
+        f"parsed only {parsed} docs snippets ({skipped} skipped as signatures), expected more than"
+        f" {MIN_PARSED_DOCS_BLOCKS}: snippet extraction is broken and the guard checked nothing"
+    )
+    assert not offenders, "resource calls without a client in docs:\n" + "\n".join(offenders)
+
+
+@pytest.mark.parametrize(
+    ("markdown", "expected"),
+    [
+        pytest.param("```python\nPod(client=c)\n```\n", [(2, "Pod(client=c)")], id="python-fence"),
+        pytest.param("```py\nPod(client=c)\n```\n", [(2, "Pod(client=c)")], id="py-fence"),
+        pytest.param("```bash\nkubectl get pods\n```\n", [], id="non-python-fence-is-skipped"),
+        pytest.param("no fences here\n", [], id="no-fence"),
+        pytest.param(
+            "```python\na = 1\n```\n\ntext\n\n```python\nb = 2\n```\n",
+            [(2, "a = 1"), (8, "b = 2")],
+            id="two-blocks-report-absolute-lines",
+        ),
+        pytest.param("- item:\n  ```python\n  a = 1\n  ```\n", [(3, "a = 1")], id="list-nested-fence-is-dedented"),
+    ],
+)
+def test_markdown_python_block_extraction(tmp_path: Path, markdown: str, expected: list[tuple[int, str]]) -> None:
+    """The Markdown extractor must find python fences and keep absolute line numbers.
+
+    Args:
+        tmp_path: Pytest temporary directory.
+        markdown: Markdown source to parse.
+        expected: Expected ``(first_code_line, code)`` pairs.
+    """
+    notebook = tmp_path / "page.md"
+    notebook.write_text(markdown, encoding="utf-8")
+
+    assert _markdown_python_blocks(path=notebook) == expected
 
 
 @pytest.mark.parametrize(
