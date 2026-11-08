@@ -1,0 +1,67 @@
+name: Docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      # Any docs change, not just .md: the migration that removes the committed output touches
+      # only generated paths, and it must still deploy. The workflow file is listed because it
+      # carries the tagline, so editing it changes the built site.
+      - "docs/**"
+      - ".github/workflows/docs.yml"
+  # The first deploy after Pages is switched to build_type=workflow has no push to ride on.
+  workflow_dispatch:
+
+concurrency:
+  group: docs
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    # workflow_dispatch accepts any ref, so without this guard `gh workflow run docs.yml --ref
+    # some-branch` would publish that branch's docs/ to the live Pages site. Deploying is main-only;
+    # a manual run is still how the first deploy after the Pages switch is triggered.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    # Building needs nothing but the sources: publish rights live on the deploy job alone, so
+    # whatever the build step runs can never reach Pages.
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The build runs a third-party generator; leaving the token in .git/config would hand it
+          # to that process for the rest of the job.
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+      - name: Build site from docs/*.md
+        # Pinned, because this job's output is what `deploy` publishes: `@latest` would let a new
+        # upstream release change the live site with no commit here. Bump deliberately (and bump
+        # CONTRIBUTING.md's command with it) after reviewing the release.
+        # --repo-url is explicit on purpose: pi-docsite otherwise derives it from `origin`, and a
+        # build from a fork rewrites every repository link.
+        run: >-
+          uvx pi-docsite@4.18.0 --docs-dir docs
+          --repo-url https://github.com/RedHatQE/openshift-python-wrapper
+          --tagline "Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls"
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    # The only job that publishes.
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
