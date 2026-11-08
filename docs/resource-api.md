@@ -123,12 +123,12 @@ See [Understanding the Resource Class Hierarchy](resource-class-hierarchy.html) 
 ### Constructor
 
 ```python
-Resource(
-    name="my-resource",  # positional
-    *,
-    client=client,  # keyword-only, required
-)
+Resource(name="my-resource", client=client)
 ```
+
+The real signature places `client` behind a bare `*`, so it must be passed as a keyword:
+`def __init__(self, name=None, *, client, teardown=True, ...)`. `name` stays positional-or-keyword;
+anything after `*` (including `client`) is keyword-only.
 
 | Parameter | Type | Default | Description |
 |---|---|---|---|

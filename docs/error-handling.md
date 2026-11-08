@@ -182,14 +182,14 @@ client is required. Pass a DynamicClient from get_client() or get_client(fake=Tr
 ```python
 from ocp_resources.exceptions import MissingClientError
 from ocp_resources.pod import Pod
-from ocp_resources.resource import get_client
 
-client = get_client(fake=True)
 try:
-    pod = Pod(client=client if client else None, name="my-pod", namespace="default")
+    pod = Pod(client=None, name="my-pod", namespace="default")
 except MissingClientError as e:
     print(e)  # client is required. Pass a DynamicClient from get_client() or get_client(fake=True).
 ```
+
+> **Note:** Omitting `client` altogether never reaches `MissingClientError` - Python rejects the missing keyword-only argument first, with `TypeError: ... missing 1 required keyword-only argument: 'client'`.
 
 > **Note:** Passing the removed `dyn_client`, `config_file`, `config_dict` or `context` keywords raises a plain `TypeError` with an `Unsupported argument(s): ...` message instead - see [Migrating to the Mandatory `client`](resource-api.html#migrating-to-the-mandatory-client).
 
