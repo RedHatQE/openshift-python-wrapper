@@ -54,7 +54,6 @@ class MachineSet(NamespacedResource):
         name=None,
         namespace=None,
         teardown=True,
-        client=None,
         machine_role="worker",
         machine_type="worker",
         replicas=1,
@@ -66,7 +65,6 @@ class MachineSet(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

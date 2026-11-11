@@ -11,7 +11,6 @@ class OperatorGroup(NamespacedResource):
         namespace=None,
         target_namespaces=None,
         teardown=True,
-        client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
         **kwargs,
@@ -23,7 +22,6 @@ class OperatorGroup(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

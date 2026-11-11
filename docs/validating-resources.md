@@ -13,6 +13,7 @@ Catch configuration mistakes before they reach the Kubernetes API by validating 
 from ocp_resources.pod import Pod
 
 pod = Pod(
+    client=client,
     name="nginx-pod",
     namespace="default",
     containers=[{"name": "nginx", "image": "nginx:latest"}],
@@ -33,6 +34,7 @@ from ocp_resources.exceptions import ValidationError
 from ocp_resources.service import Service
 
 service = Service(
+    client=client,
     name="nginx-service",
     namespace="default",
     selector={"app": "nginx"},

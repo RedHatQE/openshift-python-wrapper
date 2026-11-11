@@ -69,6 +69,38 @@ See [Connecting to Clusters](connecting-to-clusters.html) for connection pattern
 
 ---
 
+## Migrating to the Mandatory `client`
+
+`client` is now a **required keyword-only** argument on `Resource` / `NamespacedResource`, and a required first argument on the `.get()`, `.get_all_cluster_resources()` and `Event` APIs. The library no longer creates a client for you, so nothing happens implicitly from `KUBECONFIG` or `~/.kube/config`.
+
+| Before | After |
+|---|---|
+| `Pod(name="p", namespace="ns")` | `Pod(client=client, name="p", namespace="ns")` |
+| `Pod(dyn_client=client, ...)` | `Pod(client=client, ...)` - `dyn_client` raises `TypeError` |
+| `Pod(config_file="~/.kube/config", ...)` | `Pod(client=get_client(config_file="~/.kube/config"), ...)` |
+| `Pod(config_dict={...}, ...)` | `Pod(client=get_client(config_dict={...}), ...)` |
+| `Pod(context="prod", ...)` | `Pod(client=get_client(context="prod"), ...)` |
+| `Pod.get(dyn_client=client, ...)` | `Pod.get(client=client, ...)` |
+| `Event.get(dyn_client=client, ...)` | `Event.get(client=client, ...)` |
+
+`config_file`, `config_dict` and `context` still exist - they now belong to `get_client()` only.
+
+```python
+from ocp_resources.pod import Pod
+from ocp_resources.resource import get_client
+
+client = get_client()  # once, at session/module setup
+pod = Pod(client=client, name="my-pod", namespace="default")
+```
+
+### Failure modes to know about
+
+- Passing a removed keyword (`dyn_client`, `config_file`, `config_dict`, `context`) raises `TypeError: Unsupported argument(s): ...` with the migration hint.
+- Omitting `client` raises `TypeError` (`... missing 1 required keyword-only argument: 'client'`); passing `client=None` raises `MissingClientError`, whose message names `get_client()`.
+- Removing `client` from the middle of a legacy constructor signature means old **positional** calls no longer fail loudly - the argument silently binds to the next parameter. For example `Secret("n", "ns", client)` used to set `client` and now sets `accesskeyid`; `BridgeNetworkAttachmentDefinition(...)` used to take `client` as the 7th positional and now takes `mtu` there. Pass `client` by keyword and construct these resources with keywords only.
+
+---
+
 ## `Resource`
 
 ```python
@@ -91,15 +123,16 @@ See [Understanding the Resource Class Hierarchy](resource-class-hierarchy.html) 
 ### Constructor
 
 ```python
-Resource(
-    client=client,
-    name="my-resource",
-)
+Resource(name="my-resource", client=client)
 ```
+
+The real signature places `client` behind a bare `*`, so it must be passed as a keyword:
+`def __init__(self, name=None, *, client, teardown=True, ...)`. `name` stays positional-or-keyword;
+anything after `*` (including `client`) is keyword-only.
 
 | Parameter | Type | Default | Description |
 |---|---|---|---|
-| `client` | `DynamicClient \| None` | `None` | Kubernetes dynamic client. Will be mandatory in the next major release. |
+| `client` | `DynamicClient` | **required** | Kubernetes dynamic client; keyword-only. Obtain it from `get_client()` (or `get_client(fake=True)` in tests). A missing or `None` client raises (`MissingClientError` subclasses `TypeError`). |
 | `name` | `str \| None` | `None` | Resource name. Required unless `yaml_file` or `kind_dict` is provided. |
 | `teardown` | `bool` | `True` | Whether this resource should be deleted when used as a context manager. |
 | `yaml_file` | `str \| None` | `None` | Path to a YAML file defining the resource. Mutually exclusive with `kind_dict`. |
@@ -107,9 +140,6 @@ Resource(
 | `dry_run` | `bool` | `False` | If `True`, create operations use dry-run mode. |
 | `node_selector` | `dict[str, Any] \| None` | `None` | Node selector for scheduling. |
 | `node_selector_labels` | `dict[str, str] \| None` | `None` | Node selector labels for scheduling. |
-| `config_file` | `str \| None` | `None` | Path to kubeconfig. Deprecated; pass `client` instead. |
-| `config_dict` | `dict[str, Any] \| None` | `None` | Kubeconfig dict. |
-| `context` | `str \| None` | `None` | Kubeconfig context name. Deprecated; pass `client` instead. |
 | `label` | `dict[str, str] \| None` | `None` | Labels to set on the resource. |
 | `annotations` | `dict[str, str] \| None` | `None` | Annotations to set on the resource. |
 | `api_group` | `str` | `""` | Override the class-level `api_group`. |
@@ -119,11 +149,15 @@ Resource(
 | `wait_for_resource` | `bool` | `False` | When used as a context manager, wait for the resource to exist after creation. |
 | `schema_validation_enabled` | `bool` | `False` | Enable automatic OpenAPI schema validation on `create()` and `update_replace()`. |
 
+`config_file`, `config_dict` and `context` are **not** constructor arguments any more - they belong to `get_client()`. Passing them (or `dyn_client`) through a resource constructor raises `TypeError` with a migration hint. See [Migrating to the Mandatory `client`](#migrating-to-the-mandatory-client).
+
 **Raises:**
 
 | Exception | Condition |
 |---|---|
 | `ValueError` | Both `yaml_file` and `kind_dict` are provided. |
+| `TypeError` | `dyn_client`, `config_file`, `config_dict`, `context`, or any unknown keyword argument is passed. |
+| `MissingClientError` | `client` is `None` (a `TypeError` subclass, so existing `except TypeError` handlers keep working). |
 | `NotImplementedError` | Neither `api_group` nor `api_version` is defined on the class. |
 | `MissingRequiredArgumentError` | None of `name`, `yaml_file`, or `kind_dict` is provided. |
 | `ResourceNotFoundError` | `ensure_exists=True` and the resource does not exist. |
@@ -424,14 +458,11 @@ Get the resource API object with optional filtering kwargs.
 @classmethod
 def get(
     cls,
-    client: DynamicClient | None = None,
-    dyn_client: DynamicClient | None = None,
-    config_file: str = "",
+    client: DynamicClient,
+    *,
     singular_name: str = "",
     exceptions_dict: dict[type[Exception], list[str]] = ...,
     raw: bool = False,
-    context: str | None = None,
-    *args: Any,
     **kwargs: Any,
 ) -> Generator[Any, None, None]
 ```
@@ -440,16 +471,17 @@ List resources of this kind from the cluster.
 
 | Parameter | Type | Default | Description |
 |---|---|---|---|
-| `client` | `DynamicClient \| None` | `None` | Kubernetes client. |
-| `dyn_client` | `DynamicClient \| None` | `None` | Deprecated alias for `client`. |
-| `config_file` | `str` | `""` | Path to kubeconfig. Deprecated; pass `client`. |
+| `client` | `DynamicClient` | **required** | Kubernetes client; positional or keyword. Obtain it from `get_client()`. |
 | `singular_name` | `str` | `""` | Singular resource name for disambiguation. |
 | `exceptions_dict` | `dict` | `DEFAULT_CLUSTER_RETRY_EXCEPTIONS` | Exceptions to retry. |
 | `raw` | `bool` | `False` | If `True`, yield raw `ResourceInstance` objects instead of wrapper instances. |
-| `context` | `str \| None` | `None` | Kubeconfig context. Deprecated; pass `client`. |
 | `**kwargs` | | | Passed through to the API (e.g., `label_selector`, `field_selector`). |
 
 **Returns:** `Generator` of resource instances.
+
+**Raises:** `MissingClientError` if `client` is `None`; `TypeError` if `dyn_client`, `config_file`, `config_dict` or `context` is passed, or if an extra positional argument is given (`singular_name` and the rest are keyword-only).
+
+`dyn_client`, `config_file` and `context` are no longer accepted - see [Migrating to the Mandatory `client`](#migrating-to-the-mandatory-client).
 
 > **Note:** For `Resource` (cluster-scoped), yielded objects are constructed with `name` only. For `NamespacedResource`, yielded objects include both `name` and `namespace`.
 
@@ -477,11 +509,7 @@ See [Querying and Watching Resources](querying-resources.html) for advanced list
 ```python
 @staticmethod
 def get_all_cluster_resources(
-    client: DynamicClient | None = None,
-    config_file: str = "",
-    context: str | None = None,
-    config_dict: dict[str, Any] | None = None,
-    *args: Any,
+    client: DynamicClient,
     **kwargs: Any,
 ) -> Generator[ResourceField, None, None]
 ```
@@ -490,10 +518,12 @@ Yield all resources across **all** API groups in the cluster.
 
 | Parameter | Type | Default | Description |
 |---|---|---|---|
-| `client` | `DynamicClient \| None` | `None` | Kubernetes client. |
+| `client` | `DynamicClient` | **required** | Kubernetes client; positional or keyword. Obtain it from `get_client()`. |
 | `**kwargs` | | | Passed to the API (e.g., `label_selector`). |
 
 **Yields:** `ResourceField`
+
+**Raises:** `MissingClientError` if `client` is `None`; `TypeError` if `dyn_client`, `config_file`, `config_dict` or `context` is passed, or if an extra positional argument is given. `client` is validated before iteration starts, so a bad call fails immediately instead of on the first `next()`.
 
 ```python
 for resource in Resource.get_all_cluster_resources(client=client, label_selector="app=myapp"):

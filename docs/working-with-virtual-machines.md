@@ -14,6 +14,7 @@ Manage the full lifecycle of KubeVirt virtual machines on OpenShift — create V
 from ocp_resources.virtual_machine import VirtualMachine
 
 vm = VirtualMachine(
+    client=client,
     name="my-vm",
     namespace="my-namespace",
     body={
@@ -41,6 +42,7 @@ with vm:
 from ocp_resources.virtual_machine import VirtualMachine
 
 vm = VirtualMachine(
+    client=client,
     name="my-vm",
     namespace="my-namespace",
     body={
@@ -67,6 +69,7 @@ You can also create a VM from a YAML file:
 
 ```python
 vm = VirtualMachine(
+    client=client,
     name="my-vm",
     namespace="my-namespace",
     yaml_file="vm-definition.yaml",
@@ -182,6 +185,7 @@ vmi = vm.vmi  # Returns a VirtualMachineInstance object
 from ocp_resources.virtual_machine_instance import VirtualMachineInstance
 
 vmi = VirtualMachineInstance(
+    client=client,
     name="my-vmi",
     namespace="my-namespace",
     domain={
@@ -336,6 +340,7 @@ Trigger a live migration by creating a `VirtualMachineInstanceMigration`:
 from ocp_resources.virtual_machine_instance_migration import VirtualMachineInstanceMigration
 
 migration = VirtualMachineInstanceMigration(
+    client=client,
     name="migrate-my-vm",
     namespace="my-namespace",
     vmi_name="my-vm",
@@ -353,6 +358,7 @@ Control resource allocation for migrations:
 from ocp_resources.virtual_machine_migration_resource_quota import VirtualMachineMigrationResourceQuota
 
 quota = VirtualMachineMigrationResourceQuota(
+    client=client,
     name="migration-quota",
     namespace="my-namespace",
     requests_cpu="2",
@@ -371,6 +377,7 @@ quota.deploy()
 from ocp_resources.virtual_machine_snapshot import VirtualMachineSnapshot
 
 snapshot = VirtualMachineSnapshot(
+    client=client,
     name="my-vm-snapshot",
     namespace="my-namespace",
     vm_name="my-vm",
@@ -390,6 +397,7 @@ snapshot.wait_snapshot_done(timeout=300)
 from ocp_resources.virtual_machine_restore import VirtualMachineRestore
 
 restore = VirtualMachineRestore(
+    client=client,
     name="my-vm-restore",
     namespace="my-namespace",
     vm_name="my-vm",
@@ -415,6 +423,7 @@ The `wait_restore_done()` method checks both the restore's `complete` status and
 from ocp_resources.virtual_machine_clone import VirtualMachineClone
 
 clone = VirtualMachineClone(
+    client=client,
     name="clone-my-vm",
     namespace="my-namespace",
     source_name="my-vm",
@@ -444,6 +453,7 @@ clone.deploy()
 from ocp_resources.virtual_machine_export import VirtualMachineExport
 
 export = VirtualMachineExport(
+    client=client,
     name="export-my-vm",
     namespace="my-namespace",
     source={"apiGroup": "kubevirt.io", "kind": "VirtualMachine", "name": "my-vm"},
@@ -467,6 +477,7 @@ KubeVirt instance types define reusable VM sizing profiles. Preferences define n
 from ocp_resources.virtual_machine_instancetype import VirtualMachineInstancetype
 
 instancetype = VirtualMachineInstancetype(
+    client=client,
     name="small",
     namespace="my-namespace",
     cpu={"guest": 2},
@@ -483,6 +494,7 @@ Both `cpu` and `memory` are **required**. Omitting either raises `MissingRequire
 from ocp_resources.virtual_machine_cluster_instancetype import VirtualMachineClusterInstancetype
 
 cluster_instancetype = VirtualMachineClusterInstancetype(
+    client=client,
     name="large",
     cpu={"guest": 8},
     memory={"guest": "16Gi"},
@@ -497,6 +509,7 @@ cluster_instancetype.deploy()
 from ocp_resources.virtual_machine_preference import VirtualMachinePreference
 
 preference = VirtualMachinePreference(
+    client=client,
     name="linux-pref",
     namespace="my-namespace",
     cpu={"preferredCPUTopology": "preferSockets"},
@@ -511,6 +524,7 @@ preference.deploy()
 from ocp_resources.virtual_machine_cluster_preference import VirtualMachineClusterPreference
 
 cluster_preference = VirtualMachineClusterPreference(
+    client=client,
     name="windows-pref",
     clock={"preferredTimer": {"hpet": {"present": False}}},
     features={"preferredHyperv": {"spinlocks": {"spinlocks": 8191}}},
@@ -526,6 +540,7 @@ Scale out VMIs horizontally:
 from ocp_resources.virtual_machine_instance_replica_set import VirtualMachineInstanceReplicaSet
 
 replica_set = VirtualMachineInstanceReplicaSet(
+    client=client,
     name="my-vmi-rs",
     namespace="my-namespace",
     replicas=3,
@@ -555,6 +570,7 @@ from ocp_resources.virtual_machine_storage_migration import VirtualMachineStorag
 
 # Create a migration plan
 plan = VirtualMachineStorageMigrationPlan(
+    client=client,
     name="migrate-storage",
     namespace="my-namespace",
     virtual_machines=[{"name": "my-vm", "volumes": [{"name": "rootdisk", "target": {"storageClassName": "fast-ssd"}}]}],
@@ -564,6 +580,7 @@ plan.deploy()
 
 # Execute the migration
 migration = VirtualMachineStorageMigration(
+    client=client,
     name="migrate-storage-exec",
     namespace="my-namespace",
     virtual_machine_storage_migration_plan_ref={"name": "migrate-storage", "namespace": "my-namespace"},
@@ -577,6 +594,7 @@ migration.deploy()
 from ocp_resources.virtual_machine_template import VirtualMachineTemplate
 
 template = VirtualMachineTemplate(
+    client=client,
     name="fedora-template",
     namespace="my-namespace",
     virtual_machine={
@@ -601,11 +619,12 @@ template.deploy()
 
 ```python
 # List all VMs in a namespace
-for vm in VirtualMachine.get(namespace="my-namespace"):
+for vm in VirtualMachine.get(client=client, namespace="my-namespace"):
     print(f"{vm.name}: {vm.instance.get('status', {}).get('printableStatus')}")
 
 # List with label selectors
 for vm in VirtualMachine.get(
+    client=client,
     namespace="my-namespace",
     label_selector="app=webserver",
 ):

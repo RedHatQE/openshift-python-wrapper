@@ -34,7 +34,6 @@ class NodeNetworkConfigurationPolicy(Resource):
     def __init__(
         self,
         name=None,
-        client=None,
         capture=None,
         node_selector=None,
         node_selector_labels=None,
@@ -72,7 +71,6 @@ class NodeNetworkConfigurationPolicy(Resource):
         """
         super().__init__(
             name=name,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
@@ -236,7 +234,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         if not self.nodes:
             return None
 
-        nns = NodeNetworkState(name=self.nodes[0].name)
+        nns = NodeNetworkState(name=self.nodes[0].name, client=self.client)
         _port = [_iface for _iface in nns.interfaces if _iface["name"] == port_name]
         return _port[0] if _port else None
 
