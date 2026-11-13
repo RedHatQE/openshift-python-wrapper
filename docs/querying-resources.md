@@ -109,18 +109,18 @@ for resource in Resource.get_all_cluster_resources(client=client, label_selector
 @classmethod
 def get(
     cls,
-    client: DynamicClient | None = None,
+    client: DynamicClient,
+    *,
     singular_name: str = "",
     exceptions_dict: dict[type[Exception], list[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
     raw: bool = False,
-    *args,
     **kwargs,
 ) -> Generator
 ```
 
 | Parameter | Type | Description |
 |---|---|---|
-| `client` | `DynamicClient` | Kubernetes dynamic client (required) |
+| `client` | `DynamicClient` | Kubernetes dynamic client (required; positional or keyword) |
 | `singular_name` | `str` | Resource kind in lowercase; used when multiple resources match the same kind |
 | `raw` | `bool` | If `True`, return raw `ResourceInstance`/`ResourceField` objects instead of wrapper instances |
 | `exceptions_dict` | `dict` | Exceptions to retry on during API calls |

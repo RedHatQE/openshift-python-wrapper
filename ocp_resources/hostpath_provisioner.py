@@ -17,7 +17,6 @@ class HostPathProvisioner(Resource):
         name=None,
         path=None,
         image_pull_policy=None,
-        client=None,
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
@@ -25,7 +24,6 @@ class HostPathProvisioner(Resource):
     ):
         super().__init__(
             name=name,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

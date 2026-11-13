@@ -14,7 +14,6 @@ class Lease(NamespacedResource):
         self,
         name=None,
         namespace=None,
-        client=None,
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
@@ -29,7 +28,6 @@ class Lease(NamespacedResource):
         Args:
             name (str): Name of the Lease resource
             namespace (str): Namespace of Lease resource
-            client: (DynamicClient): DynamicClient for api calls
             teardown (bool): Indicates if the resource should be torn down at the end
             holder_identity (str, optional): identify of the holder of the current lease
             lease_duration_seconds (int, optional): duration for which candidate of a lease needs to wait to acquire it
@@ -42,7 +40,6 @@ class Lease(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

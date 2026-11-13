@@ -11,7 +11,6 @@ class Job(NamespacedResource):
     Args:
         name (str): Job name.
         namespace (str): Namespace name.
-        client (DynamicClient): Dynamic client for connecting to a remote cluster.
         teardown (bool): Indicates if this resource would need to be deleted.
         yaml_file (str): Yaml file for the resource.
         delete_timeout (int): Timeout associated with delete action.
@@ -35,7 +34,6 @@ class Job(NamespacedResource):
         self,
         name=None,
         namespace=None,
-        client=None,
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
@@ -50,7 +48,6 @@ class Job(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

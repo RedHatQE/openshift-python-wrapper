@@ -22,6 +22,7 @@ This creates a Python file in `ocp_resources/` with a fully typed class you can 
 from ocp_resources.deployment import Deployment
 
 dep = Deployment(
+    client=client,
     name="my-app",
     namespace="default",
     replicas=3,

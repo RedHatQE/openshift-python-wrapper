@@ -270,6 +270,7 @@ You can also validate manually without creating:
 
 ```python
 pod = Pod(
+    client=client,
     name="check-me",
     namespace="default",
     containers=[{"name": "nginx", "image": "nginx:latest"}],

@@ -1,4 +1,7 @@
+from ocp_resources.resource import get_client
 from ocp_resources.role import Role
+
+client = get_client()
 
 # The example bellow is also relevant for the ClusterRole resource.
 # Add multiple rules to a specific Role or ClusterRole as a list of rules dictionaries:
@@ -20,6 +23,7 @@ rules = [
     },
 ]
 latency_role = Role(
+    client=client,
     name="latency-role",
     namespace="namespace_name",
     rules=rules,

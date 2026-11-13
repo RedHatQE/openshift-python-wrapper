@@ -14,7 +14,6 @@ class MetalLB(NamespacedResource):
         self,
         name=None,
         namespace=None,
-        client=None,
         log_level="info",
         speaker_config=None,
         speaker_tolerations=None,
@@ -24,7 +23,6 @@ class MetalLB(NamespacedResource):
         Args:
             name (str): Name of the MetalLB or it's CR's.
             namespace (str): Namespace of the MetalLB
-            client: (DynamicClient): DynamicClient to use.
             log_level(str): The verbosity of the controller and the speaker logging.
                             Allowed values are: all, debug, info, warn, error, none. (default: info)
             speaker_config (dict): Additional configs to be applied on MetalLB Speaker daemonset.
@@ -33,7 +31,6 @@ class MetalLB(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             **kwargs,
         )
         self.log_level = log_level

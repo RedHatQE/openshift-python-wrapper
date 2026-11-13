@@ -9,7 +9,6 @@ class Subscription(NamespacedResource):
         self,
         name=None,
         namespace=None,
-        client=None,
         source=None,
         source_namespace=None,
         package_name=None,
@@ -24,7 +23,6 @@ class Subscription(NamespacedResource):
         **kwargs,
     ):
         super().__init__(
-            client=client,
             name=name,
             namespace=namespace,
             teardown=teardown,

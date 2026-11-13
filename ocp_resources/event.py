@@ -1,10 +1,11 @@
-import warnings
 from collections.abc import Generator
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from kubernetes.dynamic import DynamicClient
 from simple_logger.logger import get_logger
+
+from ocp_resources.exceptions import MissingClientError
 
 LOGGER = get_logger(name=__name__)
 
@@ -16,29 +17,10 @@ class Event:
 
     api_version = "v1"
 
-    # TODO: remove once `client` is mandatory
-    @staticmethod
-    def _resolve_client(
-        client: DynamicClient | None,
-        dyn_client: DynamicClient | None,
-    ) -> DynamicClient:
-        """Resolve client from new or deprecated parameter with deprecation warning."""
-        if client is None and dyn_client is not None:
-            warnings.warn(
-                "`dyn_client` arg will be renamed to `client` and will be mandatory in the next major release.",
-                FutureWarning,
-                stacklevel=3,  # Adjusted for helper function call
-            )
-
-        resolved = client or dyn_client
-        assert resolved is not None, "Either 'client' or 'dyn_client' must be provided"
-        return resolved
-
     @classmethod
     def get(
         cls,
-        client: DynamicClient | None = None,  # TODO: make mandatory in the next major release
-        dyn_client: DynamicClient | None = None,  # TODO: remove in the next major release
+        client: DynamicClient,
         namespace: str | None = None,
         name: str | None = None,
         label_selector: str | None = None,
@@ -50,8 +32,7 @@ class Event:
         get - retrieves K8s events.
 
         Args:
-            client (DynamicClient): K8s client
-            dyn_client (DynamicClient): K8s client
+            client (DynamicClient): Mandatory K8s client; obtain it from get_client().
             namespace (str): event namespace
             name (str): event name
             label_selector (str): filter events by labels; comma separated string of key=value
@@ -60,8 +41,11 @@ class Event:
             resource_version (str): filter events by their resource's version
             timeout (int): timeout in seconds
 
-        Returns
-            list: event objects
+        Returns:
+            generator: Yields watched event objects; the client is validated before iteration.
+
+        Raises:
+            MissingClientError: If client is None.
 
         example: reading all CSV Warning events in namespace "my-namespace", with reason of "AnEventReason"
               for event in Event.get(
@@ -72,7 +56,8 @@ class Event:
               ):
                 print(event.object)
         """
-        _client = cls._resolve_client(client, dyn_client)
+        if client is None:
+            raise MissingClientError()
 
         LOGGER.info("Reading events")
         LOGGER.debug(
@@ -81,15 +66,18 @@ class Event:
             f" resource_version={resource_version}, timeout={timeout}"
         )
 
-        event_listener = _client.resources.get(api_version=cls.api_version, kind=cls.__name__)
-        yield from event_listener.watch(
-            namespace=namespace,
-            name=name,
-            label_selector=label_selector,
-            field_selector=field_selector,
-            resource_version=resource_version,
-            timeout=timeout,
-        )
+        def _get() -> Generator[Any, None, None]:
+            event_listener = client.resources.get(api_version=cls.api_version, kind=cls.__name__)
+            yield from event_listener.watch(
+                namespace=namespace,
+                name=name,
+                label_selector=label_selector,
+                field_selector=field_selector,
+                resource_version=resource_version,
+                timeout=timeout,
+            )
+
+        return _get()
 
     @staticmethod
     def _parse_timestamp(event: Any) -> datetime | None:
@@ -119,7 +107,7 @@ class Event:
         this method returns already-existing events immediately.
 
         Args:
-            client: K8s dynamic client.
+            client: Mandatory K8s dynamic client; obtain it from get_client().
             namespace: Filter events to this namespace.
             field_selector: Filter events by fields (e.g. ``"type==Warning"``).
             label_selector: Filter events by labels.
@@ -127,6 +115,10 @@ class Event:
 
         Returns:
             List of event resource objects, sorted by ``lastTimestamp`` descending (most recent first).
+
+        Raises:
+            MissingClientError: If client is None.
+            ValueError: If ``since_seconds`` is negative.
 
         Example:
             List Warning events from the last 5 minutes in a namespace::
@@ -137,6 +129,9 @@ class Event:
                     field_selector="type==Warning",
                 )
         """
+        if client is None:
+            raise MissingClientError()
+
         if since_seconds < 0:
             raise ValueError("since_seconds must be >= 0")
 
@@ -172,8 +167,7 @@ class Event:
     @classmethod
     def delete_events(
         cls,
-        client: DynamicClient | None = None,  # TODO: make mandatory in the next major release
-        dyn_client: DynamicClient | None = None,  # TODO: remove in the next major release
+        client: DynamicClient,
         namespace: str | None = None,
         name: str | None = None,
         label_selector: str | None = None,
@@ -186,8 +180,7 @@ class Event:
             events in the test, in order to prevent false positive test.
 
         Args:
-            client (DynamicClient): K8s client
-            dyn_client (DynamicClient): K8s client
+            client (DynamicClient): Mandatory K8s client; obtain it from get_client().
             namespace (str): event namespace
             name (str): event name
             label_selector (str): filter events by labels; comma separated string of key=value
@@ -196,11 +189,15 @@ class Event:
             resource_version (str): filter events by their resource's version
             timeout (int): timeout in seconds
 
+        Raises:
+            MissingClientError: If client is None.
+
         example: deleting all the events with a reason of "AnEventReason", from "my-namespace" namespace
             def delete_events_before_test(client):
                 Event.delete_events(client=client, namespace="my-namespace", field_selector="reason=AnEventReason")
         """
-        _client = cls._resolve_client(client, dyn_client)
+        if client is None:
+            raise MissingClientError()
 
         LOGGER.info("Deleting events")
         LOGGER.debug(
@@ -209,7 +206,7 @@ class Event:
             f" resource_version={resource_version}, timeout={timeout}"
         )
 
-        _client.resources.get(api_version=cls.api_version, kind=cls.__name__).delete(
+        client.resources.get(api_version=cls.api_version, kind=cls.__name__).delete(
             namespace=namespace,
             name=name,
             label_selector=label_selector,

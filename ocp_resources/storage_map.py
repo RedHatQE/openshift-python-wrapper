@@ -38,7 +38,6 @@ class StorageMap(NamespacedResource):
         destination_provider_name=None,
         destination_provider_namespace=None,
         mapping=None,
-        client=None,
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
@@ -47,7 +46,6 @@ class StorageMap(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

@@ -19,7 +19,6 @@ class Host(NamespacedResource):
         provider_namespace=None,
         secret_name=None,
         secret_namespace=None,
-        client=None,
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
@@ -28,7 +27,6 @@ class Host(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

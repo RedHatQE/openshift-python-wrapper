@@ -15,7 +15,6 @@ class NodeNetworkState(Resource):
     def __init__(
         self,
         name=None,
-        client=None,
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
@@ -23,7 +22,6 @@ class NodeNetworkState(Resource):
     ):
         super().__init__(
             name=name,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

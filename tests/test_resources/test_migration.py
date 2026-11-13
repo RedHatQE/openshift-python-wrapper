@@ -2,7 +2,6 @@ import pytest
 
 from fake_kubernetes_client.dynamic_client import FakeDynamicClient
 from ocp_resources.migration import Migration
-from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 
 
 @pytest.mark.incremental
@@ -64,8 +63,12 @@ class TestMigration:
         assert resource_dict["spec"]["resumeConversion"] is True
         deployed_resource.clean_up(wait=False)
 
-    def test_07_migration_with_positional_client(self, fake_client: FakeDynamicClient) -> None:
-        """Preserve the existing positional constructor arguments.
+    def test_07_migration_positional_args_with_keyword_client(self, fake_client: FakeDynamicClient) -> None:
+        """Keep the documented positional constructor arguments.
+
+        `name`, `namespace`, `plan_name`, `plan_namespace` and `cut_over` stay positional;
+        `client` is passed by keyword (it reaches `NamespacedResource` through `**kwargs`,
+        so nothing enforces that at the type level - only the run-time check does).
 
         Args:
             fake_client (FakeDynamicClient): Fake Kubernetes client supplied by the fixture.
@@ -76,10 +79,7 @@ class TestMigration:
             "test-plan",
             "default",
             None,
-            fake_client,
-            True,
-            None,
-            TIMEOUT_4MINUTES,
+            client=fake_client,
         )
         assert migration.client is fake_client
         deployed_resource = migration.deploy()

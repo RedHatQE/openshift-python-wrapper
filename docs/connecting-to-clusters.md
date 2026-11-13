@@ -121,7 +121,7 @@ with Namespace(client=client, name="temp-namespace") as ns:
     ns.wait_for_status(status=Namespace.Status.ACTIVE, timeout=120)
 ```
 
-> **Warning:** The `client` parameter will become mandatory in the next major release. Always pass it explicitly. If omitted, the library creates a client automatically using the default kubeconfig, but this triggers a `FutureWarning`.
+> **Note:** `client` is a **required keyword-only** argument on every `Resource` / `NamespacedResource` constructor and a required first argument on `get()`, `get_all_cluster_resources()` and the `Event` APIs. Nothing is created implicitly: omitting it raises `TypeError` and `client=None` raises `MissingClientError`. The removed `dyn_client`, `config_file`, `config_dict` and `context` keywords now raise `TypeError` - they belong to `get_client()` only. See [Migrating to the Mandatory `client`](resource-api.html#migrating-to-the-mandatory-client).
 
 ## Environment Variables
 
@@ -289,7 +289,19 @@ When multiple authentication parameters are provided, `get_client()` uses this p
 
 ## Troubleshooting
 
-**"FutureWarning: 'client' arg will be mandatory"**
+**"TypeError: Unsupported argument(s): config_file"**
+You passed a client-config keyword to a resource instead of to `get_client()`. `config_file`, `config_dict`, `context` and `dyn_client` are no longer resource arguments:
+
+```python
+# Wrong - the kubeconfig kwargs belong to get_client() and raise TypeError:
+#   Namespace(config_file="~/.kube/config", name="my-ns")
+
+# Right
+client = get_client(config_file="~/.kube/config")
+ns = Namespace(client=client, name="my-ns")
+```
+
+**"TypeError: ... missing 1 required keyword-only argument: 'client'"**
 You are creating a resource without passing a `client`. Always call `get_client()` first and pass the result:
 
 ```python
