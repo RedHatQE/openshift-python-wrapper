@@ -36,7 +36,7 @@ jobs:
           # The build runs a third-party generator; leaving the token in .git/config would hand it
           # to that process for the rest of the job.
           persist-credentials: false
-      - uses: astral-sh/setup-uv@v10.3.3
+      - uses: astral-sh/setup-uv@v10.4.0
       - name: Build site from docs/*.md
         # Pinned, because this job's output is what `deploy` publishes: `@latest` would let a new
         # upstream release change the live site with no commit here. Bump deliberately (and bump
