@@ -363,15 +363,15 @@ dv = DataVolume(
     storage_class="ocs-storagecluster-ceph-rbd-virtualization",
     access_modes=DataVolume.AccessMode.RWX,
     volume_mode=DataVolume.VolumeMode.BLOCK,
-    api_name="storage",
 )
 dv.deploy()
 dv.wait_for_dv_success(timeout=600)
 ```
 
-Always pass `api_name="storage"` explicitly — the default will change in a future release. Use `source_dict={"blank": {}}` for empty disks, or `source_dict={"pvc": {"name": "source-pvc", "namespace": "default"}}` for cloning.
+DataVolumes use `spec.storage` by default. Pass `api_name="pvc"` to use `spec.pvc`. Use `source_dict={"blank": {}}` for empty disks, or `source_dict={"pvc": {"name": "source-pvc", "namespace": "default"}}` for cloning.
 
 - **Clone a DataVolume:**
+
   ```python
   dv_clone = DataVolume(
       client=client,
@@ -382,7 +382,6 @@ Always pass `api_name="storage"` explicitly — the default will change in a fut
       storage_class="ocs-storagecluster-ceph-rbd-virtualization",
       access_modes=DataVolume.AccessMode.RWX,
       volume_mode=DataVolume.VolumeMode.BLOCK,
-      api_name="storage",
   )
   ```
 
